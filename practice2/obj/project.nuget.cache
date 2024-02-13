@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "kvmMBqi3Ji/MameqcSekasiPTYptrJtNn7esvL+kRr9N2L6A9aaBc2/SKyEpqn0WY95r1cawCxKn1eS3yg2RFw==",
+  "success": true,
+  "projectFilePath": "/home/dxrkness/OneDrive/КНТ-22-1 year 2 half 2/dotnet/practice2/practice2.csproj",
+  "expectedPackageFiles": [
+    "/home/dxrkness/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.1/microsoft.aspnetcore.app.ref.8.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
