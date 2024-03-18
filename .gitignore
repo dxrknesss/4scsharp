@@ -4,5 +4,8 @@
 */bin
 */obj
 
+bin
+obj
+
 # when working in visual studio
 .vs

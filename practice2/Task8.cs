@@ -4,6 +4,6 @@ class Task8
 {
   public static void SolveProblem()
   {
-    // there has to be a problem
-  }
+    System.Console.WriteLine("Hello world!");
+    }
 
