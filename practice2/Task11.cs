@@ -1,4 +1,4 @@
-﻿namespace practice2;
+namespace practice2;
 
 class Task11
 {
