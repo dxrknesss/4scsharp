@@ -2,22 +2,22 @@ namespace practice4;
 
 class Point
 {
-  double _x;
-  double _y;
+  int _x;
+  int _y;
 
-  public double X
+  public int X
   {
     get => _x;
     set => _x = value;
   }
 
-  public double Y
+  public int Y
   {
     get => _y;
     set => _y = value;
   }
 
-  public Point(double X, double Y)
+  public Point(int X, int Y)
   {
     this._x = X;
     this._y = Y;
