@@ -1,6 +1,6 @@
 namespace practice4;
 
-class Rabbit : ILocatable
+class Rabbit
 {
   public delegate void RabbitEventHandler(Point NewLoc, Point OldLoc);
   public event RabbitEventHandler ChangedLocation;
@@ -29,16 +29,6 @@ class Rabbit : ILocatable
       }
       _location = value;
     }
-  }
-
-  public Point GetLocation()
-  {
-    return _location;
-  }
-
-  public void ChangeLocation(Point NewLocation)
-  {
-    Location = NewLocation;
   }
 }
 

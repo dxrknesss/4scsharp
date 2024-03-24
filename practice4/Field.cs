@@ -11,6 +11,7 @@ class Field
   public RandomMove MoveStrategy;
   byte _carrotCount = 5;
   public Rabbit AttachedRabbit { get; }
+  public Hunter AttachedHunter { get; }
 
   public char this[int row, int col] // indexer
   {
@@ -31,6 +32,8 @@ class Field
   public Field(Hunter h, Rabbit r)
   {
     AttachedRabbit = r;
+    AttachedHunter = h;
+
     for (int i = 0; i < _field.GetLength(0); i++)
     {
       for (int j = 0; j < _field.GetLength(1); j++)
@@ -48,10 +51,10 @@ class Field
     }
 
 
-    h.Location = new Point(
+    AttachedHunter.Location = new Point(
         _rnd.Next(2, (int)_xDimension - 2),
         _rnd.Next(2, (int)_yDimension - 2));
-    _field[h.Location.X, h.Location.Y] = 'H';
+    _field[AttachedHunter.Location.X, AttachedHunter.Location.Y] = 'H';
 
     int x, y;
     for (byte CarrotCount = 0; CarrotCount < _carrotCount; CarrotCount++)
@@ -68,28 +71,27 @@ class Field
 
     MoveStrategy = GenerateMoveDependOnCords;
 
-    switch (_rnd.Next(0, 4))
+    int RabbitX = (int)_xDimension - 1, RabbitY = (int)_yDimension - 1;
+    switch (_rnd.Next(0, 4)) // choose rabbit's position from 4 corners of a map
     {
-      case 0:
-        _field[0, 0] = 'r';
-        r.Location = new Point(0, 0);
+      case 0: // 00
+        RabbitX &= 0;
+        RabbitY &= 0;
         break;
-      case 1:
-        _field[_xDimension - 1, 0] = 'r';
-        r.Location = new Point((int)_xDimension - 1, 0);
+      case 1: // 01
+        RabbitX &= 0;
         break;
-      case 2:
-        _field[0, _yDimension - 1] = 'r';
-        r.Location = new Point(0, (int)_yDimension - 1);
+      case 2: // 10
+        RabbitY &= 0;
         break;
-      case 3:
-        _field[_xDimension - 1, _yDimension - 1] = 'r';
-        r.Location = new Point((int)_xDimension - 1, (int)_yDimension - 1);
+      case 3: // 11
         break;
     }
+    this._field[RabbitX, RabbitY] = 'r';
+    AttachedRabbit.Location = new Point(RabbitX, RabbitY);
   }
 
-  public void ChangeRabbitLocation(Point NewLocation, Rabbit r)
+  public void ChangeRabbitLocation(Point NewLocation)
   {
     int NewX = NewLocation.X, NewY = NewLocation.Y;
 
@@ -102,27 +104,36 @@ class Field
 
     if (this._field[NewX, NewY] == 'c')
     {
-      r.Carrots++;
+      AttachedRabbit.Carrots++;
       if (Field.Debug)
       {
-        System.Console.WriteLine($"r.Carrots: {r.Carrots}");
+        System.Console.WriteLine($"AttachedRabbit.Carrots: {AttachedRabbit.Carrots}");
         Thread.Sleep(1500);
       }
     }
 
-    this._field[r.Location.X, r.Location.Y] = this._fieldWithoutHeroes[r.Location.X, r.Location.Y];
+    if (AttachedRabbit.Location.Equals(AttachedHunter.Location))
+    {
+      this._field[AttachedRabbit.Location.X, AttachedRabbit.Location.Y] = 'H';
+    }
+    else
+    {
+      this._field[AttachedRabbit.Location.X, AttachedRabbit.Location.Y] =
+        this._fieldWithoutHeroes[AttachedRabbit.Location.X, AttachedRabbit.Location.Y];
+    }
+
     this._field[NewX, NewY] = 'r';
 
-    r.Location = NewLocation;
+    AttachedRabbit.Location = NewLocation;
     if (Field.Debug)
     {
       Thread.Sleep(1500);
     }
   }
 
-  public void ChangeHuntersLocation(Hunter h, Rabbit r)
+  public void ChangeHuntersLocation()
   {
-    Point NewLocation = MoveStrategy(h.Location, r.Location);
+    Point NewLocation = MoveStrategy(AttachedHunter.Location, AttachedRabbit.Location);
 
     if (this._field[NewLocation.X, NewLocation.Y] == '¡')
     {
@@ -130,7 +141,7 @@ class Field
       MoveStrategy = GenerateRandomMove;
       while (this._field[NewLocation.X, NewLocation.Y] == '¡' && attempts < 5) // if 5 attempts are unsuccessfull, give up
       {
-        NewLocation = MoveStrategy(h.Location, r.Location);
+        NewLocation = MoveStrategy(AttachedHunter.Location, AttachedRabbit.Location);
         attempts++;
       }
 
@@ -148,13 +159,14 @@ class Field
 
     if (Field.Debug)
     {
-      System.Console.WriteLine($"Hunter's current location: {h.Location}");
+      System.Console.WriteLine($"Hunter's current location: {AttachedHunter.Location}");
       System.Console.WriteLine($"Hunter's new location: {NewLocation}");
       Thread.Sleep(1500);
     }
 
-    this._field[h.Location.X, h.Location.Y] = this._fieldWithoutHeroes[h.Location.X, h.Location.Y];
-    h.Location = NewLocation;
+    this._field[AttachedHunter.Location.X, AttachedHunter.Location.Y] =
+      this._fieldWithoutHeroes[AttachedHunter.Location.X, AttachedHunter.Location.Y];
+    AttachedHunter.Location = NewLocation;
     if (NewLocation.X >= _xDimension || NewLocation.X < 0
         || NewLocation.Y >= _yDimension || NewLocation.Y < 0) // if hunter is going to go out of bounds, respawn him in a random place on the field
     {
@@ -164,7 +176,13 @@ class Field
       NewLocation.Y = randY;
       return;
     }
-    this._field[NewLocation.X, NewLocation.Y] = 'H';
+    this._field[AttachedHunter.Location.X, AttachedHunter.Location.Y] = 'H';
+    if (Field.Debug)
+    {
+      System.Console.WriteLine("Sucessfully moved hunter's char");
+      System.Console.WriteLine($"New char's cords are: {AttachedHunter.Location}");
+      Thread.Sleep(1500);
+    }
   }
 
   Point GenerateMoveDependOnCords(Point InPoint, Point RefPoint)

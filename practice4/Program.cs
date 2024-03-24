@@ -59,19 +59,18 @@ class Program
         default:
           continue;
       }
-      if (location.Equals(h.Location))
-      {
-        f.ChangeHuntersLocation(h, r);
-        break;
-      }
-      f.ChangeHuntersLocation(h, r);
 
-      f.ChangeRabbitLocation(location, r);
-      if (r.Location.Equals(h.Location))
+      if (location.Equals(h.Location)) // if rabbit is about to go where hunter is standing
       {
-        f.ChangeRabbitLocation(location, r);
         break;
       }
+      f.ChangeHuntersLocation();
+      if (h.Location.Equals(location)) // if hunter steps on a rabbit's location
+      {
+        f.ChangeRabbitLocation(location);
+        break;
+      }
+      f.ChangeRabbitLocation(location);
     }
     Console.Clear();
     f[h.Location.X, h.Location.Y] = 'H';
