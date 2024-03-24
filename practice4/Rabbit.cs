@@ -4,11 +4,18 @@ class Rabbit : ILocatable
 {
   public delegate void RabbitEventHandler(Point NewLoc, Point OldLoc);
   public event RabbitEventHandler ChangedLocation;
+  byte _carrotCount = 0;
 
   Point _location;
 
   public Rabbit()
   { }
+
+  public byte Carrots
+  {
+    get => _carrotCount;
+    set => _carrotCount = value;
+  }
 
   public Point Location
   {

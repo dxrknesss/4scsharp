@@ -28,9 +28,8 @@ class Program
       System.Console.WriteLine($"Anonymous: Rabbit has changed location to: {Loc}");
     };
     r.ChangedLocation += Hunter.OutputRabbitLocation;
-    System.Console.WriteLine(h.Location);
 
-    while (!r.Location.Equals(h.Location))
+    while (!r.Location.Equals(h.Location) && r.Carrots < f.CarrotCount)
     {
       Console.Clear();
       DisplayField(f);
@@ -51,29 +50,52 @@ class Program
         case ConsoleKey.RightArrow:
           location.Y++;
           break;
+        case ConsoleKey.D:
+          Field.Debug = !Field.Debug;
+          continue;
+        case ConsoleKey.R:
+          Task2();
+          return;
         default:
           continue;
       }
       if (location.Equals(h.Location))
       {
-        f.ChangeRabbitPosition(location, r);
+        f.ChangeHuntersLocation(h, r);
         break;
       }
       f.ChangeHuntersLocation(h, r);
 
-      f.ChangeRabbitPosition(location, r);
+      f.ChangeRabbitLocation(location, r);
       if (r.Location.Equals(h.Location))
       {
-        f.ChangeRabbitPosition(location, r);
+        f.ChangeRabbitLocation(location, r);
         break;
       }
     }
     Console.Clear();
     f[h.Location.X, h.Location.Y] = 'H';
     DisplayField(f);
-    Console.BackgroundColor = ConsoleColor.Red;
+
     Console.ForegroundColor = ConsoleColor.White;
-    System.Console.WriteLine("You have been caught!");
+    if (r.Carrots == f.CarrotCount)
+    {
+      Console.BackgroundColor = ConsoleColor.Green;
+      System.Console.WriteLine("You won!");
+    }
+    else
+    {
+      Console.BackgroundColor = ConsoleColor.Red;
+      System.Console.WriteLine("You have been caught!");
+    }
+
+    Console.BackgroundColor = ConsoleColor.Blue;
+    System.Console.WriteLine("Restart? Press 'R'");
+    if (Console.ReadKey().Key.Equals(ConsoleKey.R))
+    {
+      Console.ResetColor();
+      Task2();
+    }
   }
 
   static void SendPongMessage()
@@ -92,7 +114,6 @@ class Program
 
   static void DisplayField(Field f)
   {
-    ConsoleColor DefaultColor = Console.ForegroundColor;
     for (int i = 0; i < f.FieldGrid.GetLength(0); i++)
     {
       for (int j = 0; j < f.FieldGrid.GetLength(1); j++)
@@ -100,11 +121,15 @@ class Program
         if (f[i, j] == 'r') Console.ForegroundColor = ConsoleColor.Blue;
         if (f[i, j] == 'H') Console.ForegroundColor = ConsoleColor.Red;
         if (f[i, j] == '¡') Console.ForegroundColor = ConsoleColor.Green;
+        if (f[i, j] == 'c') Console.ForegroundColor = ConsoleColor.Magenta;
         System.Console.Write($"{f[i, j],5}");
-        Console.ForegroundColor = DefaultColor;
+        Console.ResetColor();
       }
       System.Console.WriteLine();
     }
+    Console.ForegroundColor = ConsoleColor.Magenta;
+    System.Console.WriteLine($"Carrots left: {f.CarrotCount - f.AttachedRabbit.Carrots}");
+    Console.ResetColor();
   }
 }
 
