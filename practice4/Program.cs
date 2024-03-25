@@ -33,10 +33,10 @@ class Program
     {
       Console.Clear();
       DisplayField(f);
-      var key = Console.ReadKey();
+      var MoveKey = Console.ReadKey();
       // create new point, so old won't be changed because of the same reference
       var location = new Point(r.Location.X, r.Location.Y);
-      switch (key.Key)
+      switch (MoveKey.Key)
       {
         case ConsoleKey.UpArrow:
           location.X--;
@@ -56,6 +56,9 @@ class Program
         case ConsoleKey.R:
           Task2();
           return;
+        case ConsoleKey.C:
+          f.OutputCarrotPoints();
+          continue;
         default:
           continue;
       }
@@ -90,11 +93,13 @@ class Program
 
     Console.BackgroundColor = ConsoleColor.Blue;
     System.Console.WriteLine("Restart? Press 'R'");
-    if (Console.ReadKey().Key.Equals(ConsoleKey.R))
+    var RestartKey = Console.ReadKey().Key;
+    while (!RestartKey.Equals(ConsoleKey.R))
     {
-      Console.ResetColor();
-      Task2();
+      RestartKey = Console.ReadKey().Key;
     }
+    Console.ResetColor();
+    Task2();
   }
 
   static void SendPongMessage()
@@ -118,9 +123,9 @@ class Program
       for (int j = 0; j < f.FieldGrid.GetLength(1); j++)
       {
         if (f[i, j] == 'r') Console.ForegroundColor = ConsoleColor.Blue;
-        if (f[i, j] == 'H') Console.ForegroundColor = ConsoleColor.Red;
-        if (f[i, j] == '¡') Console.ForegroundColor = ConsoleColor.Green;
-        if (f[i, j] == 'c') Console.ForegroundColor = ConsoleColor.Magenta;
+        else if (f[i, j] == 'H') Console.ForegroundColor = ConsoleColor.Red;
+        else if (f[i, j] == '¡') Console.ForegroundColor = ConsoleColor.Green;
+        else if (f[i, j] == 'c') Console.ForegroundColor = ConsoleColor.Magenta;
         System.Console.Write($"{f[i, j],5}");
         Console.ResetColor();
       }
