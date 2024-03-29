@@ -15,7 +15,8 @@
         <Image Source="Assets/Textures/pearlharbor.jpg"/>
         <RelativePanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,200,0,0">
             <Button x:Name="HostButton" RelativePanel.AlignHorizontalCenterWithPanel="True"
-                    PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound">
+                    PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound"
+                    Click="HostButtonClicked">
                 Host
             </Button>
 

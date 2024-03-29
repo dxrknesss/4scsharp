@@ -36,5 +36,10 @@ namespace practice6
         {
             ButtonSound.Stop();
         }
+
+        private void HostButtonClicked(object sender, RoutedEventArgs e)
+        {
+            (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
+        }
     }
 }

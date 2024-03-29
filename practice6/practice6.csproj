@@ -119,13 +119,18 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Battlefield.xaml.cs">
+      <DependentUpon>Battlefield.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LobbyMenu.xaml.cs">
       <DependentUpon>LobbyMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeaField.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -146,6 +151,7 @@
     <Content Include="Assets\Icons\Wide310x150Logo.scale-100.png" />
     <Content Include="Assets\Icons\Wide310x150Logo.scale-200.png" />
     <Content Include="Assets\Icons\Wide310x150Logo.scale-400.png" />
+    <Content Include="Assets\Textures\ship.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\Icons\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Icons\Square150x150Logo.scale-200.png" />
@@ -157,6 +163,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Battlefield.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LobbyMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
