@@ -12,6 +12,7 @@
     </Page.Resources>
 
     <Grid>
+        
         <Image Source="Assets/Textures/pearlharbor.jpg"/>
         <RelativePanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,200,0,0">
             <Button x:Name="MPButton" RelativePanel.AlignHorizontalCenterWithPanel="True" Click="OnMPClick"
@@ -24,5 +25,9 @@
                 Singleplayer game
             </Button>
         </RelativePanel>
+        
+        <Canvas>
+            <Ellipse x:Name="follower" Fill="Red" Width="50" Height="50"/>
+        </Canvas>
     </Grid>
 </Page>

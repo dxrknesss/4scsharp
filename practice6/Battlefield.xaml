@@ -8,11 +8,12 @@
     mc:Ignorable="d"
     Background="CadetBlue" Width="1600" Height="900">
 
-    <Canvas x:Name="EnemyCanvas">
+    <Grid>
+        <Canvas x:Name="EnemyCanvas">
         <StackPanel Width="1600">
             <Rectangle Fill="DarkSlateBlue" Height="60"></Rectangle>
         </StackPanel>
-        
+
         <RelativePanel x:Name="EnemyRelPanel" Canvas.Top="70" Width="1600">
             <Grid x:Name="EnemyField" Height="370" Width="1300" RelativePanel.AlignHorizontalCenterWithPanel="True">
                 <Grid.RowDefinitions>
@@ -34,66 +35,9 @@
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <Button Background="Gray" Grid.Column="0" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField">
-                    <Image Source="Assets/Textures/ship.png"></Image>
-                </Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
             </Grid>
         </RelativePanel>
-        
+
         <RelativePanel x:Name="PlayerRelPanel" Canvas.Top="460" Width="1600">
             <Grid x:Name="PlayerField" Height="370" Width="1300" RelativePanel.AlignHorizontalCenterWithPanel="True">
                 <Grid.RowDefinitions>
@@ -115,66 +59,30 @@
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <Button Background="Gray" Grid.Column="0" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="0" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
 
-                <Button Background="Gray" Grid.Column="0" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="1" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="2" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="3" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="4" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="5" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-
-                <Button Background="Gray" Grid.Column="0" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="1" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="2" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="3" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="4" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="5" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
-                <Button Background="Gray" Grid.Column="6" Grid.Row="6" Margin="2,2,2,2" Click="ClickEnemyField"></Button>
             </Grid>
         </RelativePanel>
 
         <StackPanel Width="1600" Canvas.Top="840">
             <Rectangle Fill="DarkSlateBlue" Height="60"></Rectangle>
+            <Canvas Margin="0,-60,0,0">
+                <RelativePanel Canvas.Left="60" Canvas.Top="5" Width="1600" Height="50">
+                    <Image x:Name="TakeShip" Source="Assets/Textures/ship.png"></Image>
+                    <TextBlock x:Name="ShipsLeft" RelativePanel.AlignVerticalCenterWith="TakeShip" RelativePanel.RightOf="TakeShip" FontSize="30">x4</TextBlock>
+                </RelativePanel>
+            </Canvas>
         </StackPanel>
+
+
     </Canvas>
+
+        <Canvas x:Name="ShipCloneCanvas">
+            <!-- 
+            <Button x:Name="ShipClone" Height="50" Width="50" Background="Red"  Visibility="Visible">S</Button>
+            <Rectangle x:Name="ShipClone" Height="50" Width="50" Fill="Red"  Visibility="Visible"></Rectangle>
+            -->
+            <Image x:Name="ShipClone" Height="50" Width="50" Source="Assets/Textures/ship.png" Visibility="Collapsed"></Image>
+            
+        </Canvas>
+    </Grid>
 </Page>

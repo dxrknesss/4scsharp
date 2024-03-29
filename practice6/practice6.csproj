@@ -151,6 +151,9 @@
     <Content Include="Assets\Icons\Wide310x150Logo.scale-100.png" />
     <Content Include="Assets\Icons\Wide310x150Logo.scale-200.png" />
     <Content Include="Assets\Icons\Wide310x150Logo.scale-400.png" />
+    <Content Include="Assets\Textures\longship1.png" />
+    <Content Include="Assets\Textures\longship2.png" />
+    <Content Include="Assets\Textures\longship3.png" />
     <Content Include="Assets\Textures\ship.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\Icons\LockScreenLogo.scale-200.png" />

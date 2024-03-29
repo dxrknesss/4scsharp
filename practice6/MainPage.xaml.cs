@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
@@ -28,6 +29,16 @@ namespace practice6
         {
             this.InitializeComponent();
             SetWindowSize();
+            follower.PointerMoved += MainPage_PointerMoved;
+        }
+
+        private void MainPage_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+            //follower.CapturePointer(e.Pointer);
+            var position = e.GetCurrentPoint(this).Position;
+
+            Canvas.SetLeft(follower, position.X - follower.Width / 2);
+            Canvas.SetTop(follower, position.Y - follower.Height / 2);
         }
 
         void SetWindowSize()
