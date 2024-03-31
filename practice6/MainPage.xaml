@@ -25,9 +25,5 @@
                 Singleplayer game
             </Button>
         </RelativePanel>
-        
-        <Canvas>
-            <Ellipse x:Name="follower" Fill="Red" Width="50" Height="50"/>
-        </Canvas>
     </Grid>
 </Page>
