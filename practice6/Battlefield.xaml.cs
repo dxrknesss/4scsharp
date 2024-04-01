@@ -94,7 +94,8 @@ namespace practice6
 
                 Button b = (PlayerField.Children[0] as Button);
                 Windows.Foundation.Point pos = point.Position;
-                double margin = b.Margin.Top, leftMargin = PlayerField.ActualOffset.X, topMargin = Canvas.GetTop(PlayerRelPanel);
+                var container = VisualTreeHelper.GetParent(PlayerField) as UIElement;
+                double margin = b.Margin.Top, leftMargin = PlayerRelPanel.ActualOffset.X, topMargin = PlayerRelPanel.ActualOffset.Y;
                 double buttonWidth = PlayerField.Width / SeaField._xDim - margin, buttonHeight = PlayerField.Height / SeaField._yDim - margin;
                 if ((pos.X >= playerFieldPosition.X + margin && pos.X <= playerFieldPosition.X + PlayerField.Width - margin) &&
                     (pos.Y >= playerFieldPosition.Y + margin && pos.Y <= playerFieldPosition.Y + PlayerField.Height - margin))
@@ -110,8 +111,8 @@ namespace practice6
 
                     Button button = (Button)this.FindName($"PlayerButton{row}:{col}");
                     _player[row, col] = 's';
-                    try
 
+                    try
                     {
                         RotateTransform transform = (RotateTransform)ship.RenderTransform;
                         double angle = transform.Angle;
