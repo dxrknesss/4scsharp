@@ -9,80 +9,101 @@
     Background="CadetBlue" Width="1600" Height="900">
 
     <Grid>
-        <Canvas x:Name="EnemyCanvas">
-        <StackPanel Width="1600">
-            <Rectangle Fill="DarkSlateBlue" Height="60"></Rectangle>
-        </StackPanel>
+        <Canvas x:Name="BattlefieldCanvas">
+            <StackPanel Width="1600">
+                <Rectangle Fill="DarkSlateBlue" Height="60"></Rectangle>
+            </StackPanel>
 
-        <RelativePanel x:Name="EnemyRelPanel" Canvas.Top="70" Width="1600">
-            <Grid x:Name="EnemyField" Height="370" Width="1300" RelativePanel.AlignHorizontalCenterWithPanel="True">
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                </Grid.ColumnDefinitions>
+            <RelativePanel x:Name="EnemyRelPanel" Canvas.Top="70" Width="1600">
+                <Grid x:Name="EnemyField" Height="370" Width="1300" RelativePanel.AlignHorizontalCenterWithPanel="True">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                </Grid>
+            </RelativePanel>
 
-            </Grid>
-        </RelativePanel>
+            <RelativePanel x:Name="PlayerRelPanel" Canvas.Top="460" Width="1600">
+                <Grid x:Name="PlayerField" Height="370" Width="1300" RelativePanel.AlignHorizontalCenterWithPanel="True">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                </Grid>
+            </RelativePanel>
 
-        <RelativePanel x:Name="PlayerRelPanel" Canvas.Top="460" Width="1600">
-            <Grid x:Name="PlayerField" Height="370" Width="1300" RelativePanel.AlignHorizontalCenterWithPanel="True">
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                </Grid.ColumnDefinitions>
+            <StackPanel Width="1600" Canvas.Top="840">
+                <Rectangle Fill="DarkSlateBlue" Height="60"></Rectangle>
+                <Grid Margin="0,-60,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <RelativePanel Grid.Column="0" HorizontalAlignment="Center" Height="50">
+                        <Image x:Name="TakeShip" Source="Assets/Textures/ship.png" Width="50" Height="50" PointerPressed="ClickTakeShip"></Image>
+                        <TextBlock RelativePanel.AlignVerticalCenterWith="TakeShip" RelativePanel.RightOf="TakeShip" 
+                               FontSize="30">
+                            <TextBlock.Inlines>
+                                <Run>x</Run><Run x:Name="ShortShipsLeft" Text="{x:Bind _shortShipsLeft}"></Run>
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </RelativePanel>
 
+                    <RelativePanel Grid.Column="1" Height="50">
+                        <Image x:Name="TakeMediumShip" Width="100" Height="50" Margin="200,0,0,0" Source="Assets/Textures/mediumship.png" PointerPressed="ClickTakeShip"></Image>
+                        <TextBlock RelativePanel.AlignVerticalCenterWith="TakeMediumShip" RelativePanel.RightOf="TakeMediumShip" FontSize="30">
+                            <TextBlock.Inlines>
+                                <Run>x</Run><Run x:Name="MediumShipsLeft" Text="{x:Bind _mediumShipsLeft}"></Run>
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </RelativePanel>
 
-            </Grid>
-        </RelativePanel>
-
-        <StackPanel Width="1600" Canvas.Top="840">
-            <Rectangle Fill="DarkSlateBlue" Height="60"></Rectangle>
-            <Canvas Margin="0,-60,0,0">
-                <RelativePanel Canvas.Left="60" Canvas.Top="5" Width="1600" Height="50">
-                    <Image x:Name="TakeShip" Source="Assets/Textures/ship.png"></Image>
-                    <TextBlock x:Name="ShipsLeft" RelativePanel.AlignVerticalCenterWith="TakeShip" RelativePanel.RightOf="TakeShip" FontSize="30">x4</TextBlock>
-                </RelativePanel>
-            </Canvas>
-        </StackPanel>
-
-
-    </Canvas>
+                    <RelativePanel Grid.Column="2" Height="50">
+                        <Image x:Name="TakeLongShip" Width="150" Height="50" Margin="200,0,0,0" Source="Assets/Textures/longship.png" PointerPressed="ClickTakeShip"></Image>
+                        <TextBlock RelativePanel.AlignVerticalCenterWith="TakeLongShip" RelativePanel.RightOf="TakeLongShip" FontSize="30">
+                            <TextBlock.Inlines>
+                                <Run>x</Run>
+                                <Run x:Name="LongShipsLeft" Text="{x:Bind _longShipsLeft}"></Run>
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </RelativePanel>
+                </Grid>
+            </StackPanel>
+        </Canvas>
 
         <Canvas x:Name="ShipCloneCanvas">
-            <!-- 
-            <Button x:Name="ShipClone" Height="50" Width="50" Background="Red"  Visibility="Visible">S</Button>
-            <Rectangle x:Name="ShipClone" Height="50" Width="50" Fill="Red"  Visibility="Visible"></Rectangle>
-            -->
-            <Image x:Name="ShipClone" Height="50" Width="50" Source="Assets/Textures/ship.png" Visibility="Collapsed"></Image>
-            
+            <Image x:Name="ShipClone" Width="50" Height="50" Source="Assets/Textures/ship.png" Visibility="Collapsed"></Image>
+            <Image x:Name="MediumShipClone" Width="100" Height="50" Source="Assets/Textures/mediumship.png" Visibility="Collapsed"></Image>
+            <Image x:Name="LongShipClone" Width="150" Height="50" Source="Assets/Textures/longship.png" Visibility="Collapsed"></Image>
         </Canvas>
     </Grid>
 </Page>

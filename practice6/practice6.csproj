@@ -142,6 +142,8 @@
     <Content Include="Assets\Icons\ICON.scale-150.png" />
     <Content Include="Assets\Icons\ICON.scale-200.png" />
     <Content Include="Assets\Icons\ICON.scale-400.png" />
+    <Content Include="Assets\Textures\longship.png" />
+    <Content Include="Assets\Textures\mediumship.png" />
     <Content Include="Assets\Textures\metal_texture.jpg" />
     <Content Include="Assets\Textures\pearlharbor.jpg" />
     <Content Include="Assets\Icons\Square150x150Logo.scale-100.png" />

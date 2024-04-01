@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
@@ -18,6 +14,7 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Automation;
 using System.Text;
 using Windows.ApplicationModel.ConversationalAgent;
+using System.ComponentModel;
 
 namespace practice6
 {
@@ -26,16 +23,15 @@ namespace practice6
     {
         SeaField _player = new SeaField();
         SeaField _enemy = new SeaField();
+        byte _shortShipsLeft = 4, _mediumShipsLeft = 2, _longShipsLeft = 2;
         byte _selectedShip = 0;
         bool _hasShipSelected = false;
-        Windows.Foundation.Point _takeShipStartPoint;
+
 
         public Battlefield()
-        {
+        {   
             this.InitializeComponent();
-            InitializeFields();
-
-            TakeShip.PointerPressed += ClickTakeShip;
+            InitializeFields();            
         }
 
         void InitializeFields()
@@ -65,36 +61,36 @@ namespace practice6
             }
         }
 
-        void ClickEnemyField(object sender, RoutedEventArgs e)
+        void ClickEnemyField(object sender, RoutedEventArgs e) // TODO: change
         {
             Button b = sender as Button;
             byte row = Convert.ToByte(b.GetValue(Grid.RowProperty));
             byte column = Convert.ToByte(b.GetValue(Grid.ColumnProperty));
             _enemy[row, column] = 's';
 
-            DrawShipOnField(b, true);
+            DrawShipOnField(b, 180);
         }
 
         void ShipCloneClick(object sender, PointerRoutedEventArgs e)
         {
             var point = e.GetCurrentPoint(this);
-            Image im = sender as Image;
+            Image ship = sender as Image;
             if (point.Properties.IsRightButtonPressed)
             {
-                im.RenderTransformOrigin = new Windows.Foundation.Point { X = 0.5, Y = 0.5 };
+                ship.RenderTransformOrigin = new Windows.Foundation.Point { X = 0.5, Y = 0.5 };
                 try
                 {
-                    RotateTransform transform = (RotateTransform)im.RenderTransform;
+                    RotateTransform transform = (RotateTransform)ship.RenderTransform;
                     transform.Angle += 90;
-                } catch (InvalidCastException exception)
+                }
+                catch (InvalidCastException exception)
                 {
-                    im.RenderTransform = new RotateTransform() { Angle = 90 };
+                    ship.RenderTransform = new RotateTransform() { Angle = 90 };
                 }
             }
             else if (point.Properties.IsLeftButtonPressed)
             {
-                var ttv = PlayerField.TransformToVisual(Window.Current.Content);
-                Windows.Foundation.Point playerFieldPosition = ttv.TransformPoint(new Windows.Foundation.Point(0, 0));
+                var playerFieldPosition = FindCords(PlayerField);
 
                 Button b = (PlayerField.Children[0] as Button);
                 Windows.Foundation.Point pos = point.Position;
@@ -107,57 +103,118 @@ namespace practice6
 
                     col = Convert.ToByte(Math.Ceiling((pos.X - leftMargin) / (margin + buttonWidth)) - 1);
                     row = Convert.ToByte(Math.Ceiling((pos.Y - topMargin) / (margin + buttonHeight)) - 1);
+                    if (_player[row, col] == 's')
+                    {
+                        return;
+                    }
+
                     Button button = (Button)this.FindName($"PlayerButton{row}:{col}");
                     _player[row, col] = 's';
                     try
 
                     {
-                        RotateTransform transform = (RotateTransform)im.RenderTransform;
+                        RotateTransform transform = (RotateTransform)ship.RenderTransform;
                         double angle = transform.Angle;
-                        DrawShipOnField(button, angle % 180 == 0, angle);
+                        DrawShipOnField(button, angle);
                     }
                     catch (InvalidCastException exception)
                     {
-                        DrawShipOnField(button, false); // TODO: use rotation angle as input to this function
+                        DrawShipOnField(button); // TODO: use rotation angle as input to this function
                     }
 
-                    ShipClone.PointerMoved -= TakeShipPointerMoved;
-                    ShipClone.PointerPressed -= ShipCloneClick;
-                    ShipClone.Visibility = Visibility.Collapsed;
+                    ship.PointerMoved -= TakeShipPointerMoved;
+                    ship.PointerPressed -= ShipCloneClick;
+                    ship.Visibility = Visibility.Collapsed;
+                    ship.RenderTransform = new RotateTransform();
+                    _hasShipSelected = false;
+                    _selectedShip = 0;
                 }
             }
         }
 
         void ClickTakeShip(object sender, PointerRoutedEventArgs e)
         {
-            ShipClone.PointerMoved += TakeShipPointerMoved;
-            ShipClone.PointerPressed += ShipCloneClick;
+            if (_hasShipSelected)
+            {
+                return;
+            }
 
-            var ttv = TakeShip.TransformToVisual(Window.Current.Content);
-            Windows.Foundation.Point screenCords = ttv.TransformPoint(new Windows.Foundation.Point(0, 0));
-            Canvas.SetLeft(ShipClone, screenCords.X);
-            Canvas.SetTop(ShipClone, screenCords.Y);
+            Image shipImage = null, senderImage = sender as Image;
+            byte shipsLeft;
+            string senderName = senderImage.Name;
+            if (senderName.Equals("TakeShip"))
+            {
+                shipsLeft = _shortShipsLeft;
+            }
+            else if (senderName.Equals("TakeMediumShip"))
+            {
+                shipsLeft = _mediumShipsLeft;
+            }
+            else if (senderName.Equals("TakeLongShip"))
+            {
+                shipsLeft = _longShipsLeft;
+            }
+            else
+            {
+                return;
+            }
 
-            ShipClone.Visibility = Visibility.Visible;
+            if (shipsLeft > 0)
+            {
+                switch (senderName)
+                {
+                    case "TakeShip":
+                        shipImage = ShipClone;
+                        _selectedShip = 1;
+                        _shortShipsLeft--;
+                        break;
+                    case "TakeMediumShip":
+                        shipImage = MediumShipClone;
+                        _selectedShip = 2;
+                        _mediumShipsLeft--;
+                        break;
+                    case "TakeLongShip":
+                        shipImage = LongShipClone;
+                        _selectedShip = 3;
+                        _longShipsLeft--;
+                        break;
+                    default:
+                        return;
+                }
+                shipImage.PointerMoved += TakeShipPointerMoved;
+                shipImage.PointerPressed += ShipCloneClick;
+
+                var screenCords = FindCords(senderImage);
+
+                Canvas.SetLeft(shipImage, screenCords.X);
+                Canvas.SetTop(shipImage, screenCords.Y);
+
+                _hasShipSelected = true;
+                shipImage.Visibility = Visibility.Visible;
+                Bindings.Update();
+            }
+        }
+
+        Windows.Foundation.Point FindCords(UIElement sender)
+        {
+            var ttv = sender.TransformToVisual(Window.Current.Content);
+            return ttv.TransformPoint(new Windows.Foundation.Point(0, 0));
         }
 
         void TakeShipPointerMoved(object sender, PointerRoutedEventArgs e)
         {
             var position = e.GetCurrentPoint(this).Position;
-            Canvas.SetLeft(ShipClone, position.X - ShipClone.Width / 2);
-            Canvas.SetTop(ShipClone, position.Y - ShipClone.Height / 2);
+            var ship = sender as Image;
+            Canvas.SetLeft(ship, position.X - ship.Width / 2);
+            Canvas.SetTop(ship, position.Y - ship.Height / 2);
         }
 
-        void DrawShipOnField(Button drawPlace, bool isVertical, double rotation = 0)
+        void DrawShipOnField(Button drawPlace, double rotation = 0)
         {
+            // TODO: draw different ships
             Uri uri = new Uri("ms-appx:///Assets/Textures/ship.png"); // reference file inside the app's package
             BitmapImage bitmap = new BitmapImage { UriSource = uri };
-            Image image = new Image { Source = bitmap };
-            if (!isVertical) 
-            {
-                // TODO: add horizontal ship placement
-                image.Rotation = (float)rotation;
-            }
+            Image image = new Image { Source = bitmap, Width = 64, Height = 64, Rotation = (float)rotation, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
 
             drawPlace.Content = image;
         }

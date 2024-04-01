@@ -20,7 +20,7 @@
                 Multiplayer game
             </Button>
 
-            <Button x:Name="SPButton" RelativePanel.Below="MPButton" Margin="200"
+            <Button x:Name="SPButton" RelativePanel.Below="MPButton" Margin="200" Click="OnSPClick"
                     PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound">
                 Singleplayer game
             </Button>

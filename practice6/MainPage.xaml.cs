@@ -49,6 +49,11 @@ namespace practice6
             (Window.Current.Content as Frame).Navigate(typeof(LobbyMenu));
         }
 
+        private void OnSPClick(object sender, RoutedEventArgs e)
+        {
+            (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
+        }
+
         private void ButtonOnHoverSound(object sender, PointerRoutedEventArgs e)
         {
             ButtonSound.Play();
