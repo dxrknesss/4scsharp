@@ -10,18 +10,42 @@
     
     <Grid>
         <Canvas x:Name="BattlefieldCanvas">
-            <StackPanel x:Name="EnemyShips" Height="60" Width="{x:Bind Width}">
-                <Rectangle Fill="DarkSlateBlue" Height="{x:Bind EnemyShips.Height}"></Rectangle>
+            <StackPanel x:Name="EnemyShips" Height="60" Width="{x:Bind Width}" Background="DarkSlateBlue">
+                <Grid VerticalAlignment="Center" Height="{x:Bind EnemyShips.Height}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <RelativePanel Grid.Column="0" HorizontalAlignment="Center" Height="50">
+                        <Image x:Name="EnemyShip1" Source="Assets/Textures/ship.png" Width="50" Height="50" />
+                        <TextBlock RelativePanel.AlignVerticalCenterWith="EnemyShip1" RelativePanel.RightOf="EnemyShip1" 
+                                   FontSize="30" Text="x4" />
+                    </RelativePanel>
+
+                    <RelativePanel Grid.Column="1" Height="50">
+                        <Image x:Name="EnemyShip2" Width="100" Height="50" Margin="200,0,0,0" Source="Assets/Textures/mediumship.png"/>
+                        <TextBlock RelativePanel.AlignVerticalCenterWith="EnemyShip2" RelativePanel.RightOf="EnemyShip2" 
+                                   FontSize="30" Text="x2" />
+                    </RelativePanel>
+
+                    <RelativePanel Grid.Column="2" Height="50">
+                        <Image x:Name="EnemyShip3" Width="150" Height="50" Margin="200,0,0,0" Source="Assets/Textures/longship.png"/>
+                        <TextBlock RelativePanel.AlignVerticalCenterWith="EnemyShip3" RelativePanel.RightOf="EnemyShip3" 
+                                   FontSize="30" Text="x2" />
+                    </RelativePanel>
+                </Grid>
             </StackPanel>
             
-            <StackPanel x:Name="LeftAnnBar" Width="140" Height="780" Canvas.Top="{x:Bind EnemyShips.Height}" 
-                        Orientation="Horizontal">
-                <Rectangle Fill="Navy" Width="{x:Bind LeftAnnBar.Width}" Height="{x:Bind LeftAnnBar.Height}"></Rectangle>
-            </StackPanel>
-            <StackPanel x:Name="RightAnnBar" Width="140" Height="780" Canvas.Top="{x:Bind EnemyShips.Height}" 
-                        Orientation="Horizontal" FlowDirection="RightToLeft" Canvas.Left="1460">
-                <Rectangle Fill="Navy" Width="{x:Bind RightAnnBar.Width}" Height="{x:Bind RightAnnBar.Height}"></Rectangle>
-            </StackPanel>
+            <Grid x:Name="LeftAnnBar" Width="140" Height="780" Canvas.Top="{x:Bind EnemyShips.Height}" 
+                        Background="Navy">
+                <TextBlock x:Name="LeftAnnounce" FontSize="30" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
+            </Grid>
+            <Grid x:Name="RightAnnBar" Width="140" Height="780" Canvas.Top="{x:Bind EnemyShips.Height}" 
+                        FlowDirection="RightToLeft" Canvas.Left="1460" Background="Navy">
+                <TextBlock x:Name="RightAnnounce" FontSize="{x:Bind LeftAnnounce.FontSize}" VerticalAlignment="Center" TextAlignment="Center" Text="{x:Bind LeftAnnounce.Text}"></TextBlock>
+            </Grid>
 
             <RelativePanel x:Name="EnemyRelPanel" Canvas.Top="70" Width="1300" Canvas.Left="150">
                 <Grid x:Name="EnemyField" Height="370" Width="{x:Bind EnemyRelPanel.Width}" 
@@ -71,14 +95,14 @@
                 </Grid>
             </RelativePanel>
 
-            <StackPanel x:Name="PlayerShips"  Width="1600" Height="60" Canvas.Top="840">
-                <Rectangle Fill="DarkSlateBlue" Height="{x:Bind PlayerShips.Height}"></Rectangle>
-                <Grid Margin="0,-60,0,0">
+            <StackPanel x:Name="PlayerShips"  Width="1600" Height="60" Canvas.Top="840" Background="DarkSlateBlue">
+                <Grid VerticalAlignment="Center" Height="{x:Bind PlayerShips.Height}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
+                    
                     <RelativePanel Grid.Column="0" HorizontalAlignment="Center" Height="50">
                         <Image x:Name="TakeShip" Source="Assets/Textures/ship.png" Width="50" Height="50" 
                                PointerPressed="ClickTakeShip"/>
@@ -91,8 +115,9 @@
                     </RelativePanel>
 
                     <RelativePanel Grid.Column="1" Height="50">
-                        <Image x:Name="TakeMediumShip" Width="100" Height="50" Margin="200,0,0,0" Source="Assets/Textures/mediumship.png" PointerPressed="ClickTakeShip"></Image>
-                        <TextBlock RelativePanel.AlignVerticalCenterWith="TakeMediumShip" RelativePanel.RightOf="TakeMediumShip" FontSize="30">
+                        <Image x:Name="TakeMediumShip" Width="100" Height="50" Margin="200,0,0,0" Source="Assets/Textures/mediumship.png" PointerPressed="ClickTakeShip" />
+                        <TextBlock RelativePanel.AlignVerticalCenterWith="TakeMediumShip" RelativePanel.RightOf="TakeMediumShip" 
+                                   FontSize="30">
                             <TextBlock.Inlines>
                                 <Run Text="x"/><Run x:Name="MediumShipsLeft" Text="{x:Bind _mediumShipsLeft}"/>
                             </TextBlock.Inlines>
@@ -100,8 +125,9 @@
                     </RelativePanel>
 
                     <RelativePanel Grid.Column="2" Height="50">
-                        <Image x:Name="TakeLongShip" Width="150" Height="50" Margin="200,0,0,0" Source="Assets/Textures/longship.png" PointerPressed="ClickTakeShip"></Image>
-                        <TextBlock RelativePanel.AlignVerticalCenterWith="TakeLongShip" RelativePanel.RightOf="TakeLongShip" FontSize="30">
+                        <Image x:Name="TakeLongShip" Width="150" Height="50" Margin="200,0,0,0" Source="Assets/Textures/longship.png" PointerPressed="ClickTakeShip" />
+                        <TextBlock RelativePanel.AlignVerticalCenterWith="TakeLongShip" RelativePanel.RightOf="TakeLongShip" 
+                                   FontSize="30">
                             <TextBlock.Inlines>
                                 <Run Text="x"/><Run x:Name="LongShipsLeft" Text="{x:Bind _longShipsLeft}"/>
                             </TextBlock.Inlines>

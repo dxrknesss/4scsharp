@@ -18,5 +18,8 @@
             <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
             <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
         </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Assets/Fonts/armalite.ttf#Armalite Rifle"></Setter>
+        </Style>
     </Application.Resources>
 </Application>

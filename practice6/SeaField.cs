@@ -11,21 +11,32 @@
             set => _field[x, y] = value;
         }
 
-        public bool IsOutOfRange(Point p)
+        public char this[Point[] ps]
         {
-            return p.X < 0 || p.X >= _xDim || p.Y < 0 || p.Y >= _yDim;
+            set
+            {
+                foreach(Point p in ps)
+                {
+                    _field[p.X, p.Y] = value;
+                }
+            }
         }
 
-        public bool IsOutOfRange(Point[] ps)
+        public bool IsValidPoint(Point p)
+        {
+            return p.X >= 0 && p.X < _xDim && p.Y >= 0 && p.Y < _yDim && this[p.X, p.Y] != 's';
+        }
+
+        public bool IsValidPoint(Point[] ps)
         {
             foreach (Point p in ps)
             {
-                if (IsOutOfRange(p))
+                if (!IsValidPoint(p))
                 {
-                    return true;
+                    return false;
                 }
             }
-            return false;
+            return true;
         }
     }
 }

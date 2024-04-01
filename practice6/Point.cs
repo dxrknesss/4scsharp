@@ -4,22 +4,22 @@ namespace practice6
 {
     internal class Point : ICloneable
     {
-        uint _x;
-        uint _y;
+        byte _x;
+        byte _y;
 
-        public uint X
+        public byte X
         {
             get => _x;
             set => _x = value;
         }
 
-        public uint Y
+        public byte Y
         {
             get => _y;
             set => _y = value;
         }
 
-        public Point(uint x, uint y)
+        public Point(byte x, byte y)
         {
             this._x = x;
             this._y = y;

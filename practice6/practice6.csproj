@@ -122,6 +122,7 @@
     <Compile Include="Battlefield.xaml.cs">
       <DependentUpon>Battlefield.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GameInfo.cs" />
     <Compile Include="LobbyMenu.xaml.cs">
       <DependentUpon>LobbyMenu.xaml</DependentUpon>
     </Compile>

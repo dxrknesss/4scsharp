@@ -46,11 +46,14 @@ namespace practice6
 
         private void OnMPClick(object sender, RoutedEventArgs e)
         {
+            GameInfo.CurrentGameType = GameInfo.GameType.MULTI;
             (Window.Current.Content as Frame).Navigate(typeof(LobbyMenu));
         }
 
         private void OnSPClick(object sender, RoutedEventArgs e)
         {
+            GameInfo.CurrentGameType = GameInfo.GameType.SINGLE;
+            GameInfo.PlayerCount = 0;
             (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
         }
 

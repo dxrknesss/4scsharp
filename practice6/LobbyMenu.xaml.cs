@@ -39,6 +39,8 @@ namespace practice6
 
         private void HostButtonClicked(object sender, RoutedEventArgs e)
         {
+            GameInfo.CurrentGameType = GameInfo.GameType.MULTI;
+            GameInfo.PlayerCount = 1;
             (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
         }
     }
