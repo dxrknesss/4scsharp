@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
@@ -28,7 +29,9 @@ namespace practice6
         public MainPage()
         {
             this.InitializeComponent();
+            Task.Run(() => GameInfo.GetInstance());
             SetWindowSize();
+            MPButton.Click += OnMPClick;
         }
 
         void SetWindowSize()
@@ -40,8 +43,6 @@ namespace practice6
             {
                 ApplicationView.GetForCurrentView().TryResizeView(size);
             };
-
-            MPButton.Click += OnMPClick;
         }
 
         private void OnMPClick(object sender, RoutedEventArgs e)
@@ -54,6 +55,7 @@ namespace practice6
         {
             GameInfo.CurrentGameType = GameInfo.GameType.SINGLE;
             GameInfo.PlayerCount = 0;
+            GameInfo.CurrentGameState = GameInfo.GameState.PLACE_SHIPS;
             (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
         }
 

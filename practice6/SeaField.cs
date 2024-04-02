@@ -1,9 +1,17 @@
-﻿namespace practice6
+﻿using System.Collections.ObjectModel;
+
+namespace practice6
 {
     internal class SeaField
     {
         public static byte _xDim = 7, _yDim = 7;
         char[,] _field = new char[_xDim, _yDim];
+        public ObservableCollection<Point> ShipPoints;
+
+        public SeaField()
+        {
+            ShipPoints = new ObservableCollection<Point>();
+        }
 
         public char this[byte x, byte y]
         {
@@ -24,11 +32,16 @@
 
         public bool IsValidPoint(Point p)
         {
-            return p.X >= 0 && p.X < _xDim && p.Y >= 0 && p.Y < _yDim && this[p.X, p.Y] != 's';
+            return p != null && p.X >= 0 && p.X < _xDim && p.Y >= 0 && p.Y < _yDim 
+                && this[p.X, p.Y] != 's' && this[p.X, p.Y] != 'x';
         }
 
         public bool IsValidPoint(Point[] ps)
         {
+            if (ps.Length == 0)
+            {
+                return false;
+            }
             foreach (Point p in ps)
             {
                 if (!IsValidPoint(p))

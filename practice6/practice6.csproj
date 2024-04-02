@@ -143,6 +143,9 @@
     <Content Include="Assets\Icons\ICON.scale-150.png" />
     <Content Include="Assets\Icons\ICON.scale-200.png" />
     <Content Include="Assets\Icons\ICON.scale-400.png" />
+    <Content Include="Assets\Sounds\lose_sound.wav" />
+    <Content Include="Assets\Sounds\win_sound.wav" />
+    <Content Include="Assets\Textures\explosion.png" />
     <Content Include="Assets\Textures\longship.png" />
     <Content Include="Assets\Textures\mediumship.png" />
     <Content Include="Assets\Textures\metal_texture.jpg" />

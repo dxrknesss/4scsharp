@@ -7,9 +7,24 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="CadetBlue" Width="1600" Height="900">
-    
+    <Page.Resources>
+        <MediaElement x:Name="WinSound" Source="Assets/Sounds/win_sound.wav" AutoPlay="False" Volume="30"></MediaElement>
+        <MediaElement x:Name="LoseSound" Source="Assets/Sounds/lose_sound.wav" AutoPlay="False"></MediaElement>
+    </Page.Resources>
+
     <Grid>
         <Canvas x:Name="BattlefieldCanvas">
+            <Grid x:Name="WinLoseBanner" HorizontalAlignment="Center" VerticalAlignment="Center" Height="500" Width="700"
+                  Background="Navy" Visibility="Collapsed" Canvas.ZIndex="101">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0"  x:Name="WinLoseText" FontSize="60" TextAlignment="Center"
+                           VerticalAlignment="Center">You won!</TextBlock>
+                <Button Grid.Row="1" x:Name="BackToMenuButton" VerticalAlignment="Top" Click="BackToMenu">Back to menu</Button>
+            </Grid>
+            
             <StackPanel x:Name="EnemyShips" Height="60" Width="{x:Bind Width}" Background="DarkSlateBlue">
                 <Grid VerticalAlignment="Center" Height="{x:Bind EnemyShips.Height}">
                     <Grid.ColumnDefinitions>
@@ -50,48 +65,12 @@
             <RelativePanel x:Name="EnemyRelPanel" Canvas.Top="70" Width="1300" Canvas.Left="150">
                 <Grid x:Name="EnemyField" Height="370" Width="{x:Bind EnemyRelPanel.Width}" 
                       RelativePanel.AlignHorizontalCenterWithPanel="True">
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
                 </Grid>
             </RelativePanel>
 
             <RelativePanel x:Name="PlayerRelPanel" Canvas.Top="460" Width="1300" Canvas.Left="150">
                 <Grid x:Name="PlayerField" Height="370" Width="{x:Bind PlayerRelPanel.Width}" 
                       RelativePanel.AlignHorizontalCenterWithPanel="True">
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
                 </Grid>
             </RelativePanel>
 
