@@ -17,9 +17,6 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
-using System.Reflection;
-using Windows.UI.Input.Inking;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -30,8 +27,8 @@ namespace practice6
 
     public sealed partial class Battlefield : Page
     {
-        SeaField _player = new SeaField();
-        SeaField _enemy = new SeaField();
+        SeaField _player;
+        SeaField _enemy;
         byte _shortShipsLeft = 4, _mediumShipsLeft = 2, _longShipsLeft = 2;
         byte _selectedShip = 0;
         bool _hasShipSelected = false;
@@ -41,9 +38,10 @@ namespace practice6
                 _explosion = new BitmapImage(new Uri("ms-appx:///Assets/Textures/explosion.png"));
         Random _rnd = new Random();
 
-
         public Battlefield()
         {
+            _player = new SeaField();
+            _enemy = new SeaField();
             this.InitializeComponent();
             InitializeFields();
             InitializeAnnounce();
@@ -54,12 +52,7 @@ namespace practice6
             InitializeElements();
             GameInfo.GameStateChange += ChangeAnnounceText;
             GameInfo.GameStateChange += BotAttack;
-            
-        }
 
-        void PlaySoundWhenCollectionChanges(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            WinSound.Play();
         }
 
         void InitializeFields()
@@ -153,13 +146,17 @@ namespace practice6
                     point = new Point((byte)_rnd.Next(0, SeaField._xDim), (byte)_rnd.Next(0, SeaField._yDim));
                 }
 
-                if (_player[point.X, point.Y] == 's')
+                bool hasHit = false;
+                if (_player.ShipPoints.Contains(point))
                 {
+
                     _player.ShipPoints.Remove(point);
+                    hasHit = true;
+                    CheckWinLoseCondition(_player.ShipPoints);
                 }
                 DrawHit(point, false);
                 _player[point.X, point.Y] = 'x';
-                GameInfo.CurrentGameState = GameInfo.GameState.ATTACK;
+                GameInfo.CurrentGameState = hasHit ? GameInfo.GameState.WAIT : GameInfo.GameState.ATTACK;
             }
         }
 
@@ -167,54 +164,49 @@ namespace practice6
         {
             byte enemyShips = _shortShipsLeft, enemyMidShips = _mediumShipsLeft, enemyLongShips = _longShipsLeft;
 
-            Random rnd = new Random();
-
             for (byte ships = 0; ships < enemyShips; ships++)
             {
-                DrawShipsOnEnemyFieldSingleplayer(ref rnd);
+                DrawShipsOnEnemyFieldSingleplayer(ref _rnd);
             }
 
             for (byte ships = 0; ships < enemyMidShips; ships++)
             {
-                DrawShipsOnEnemyFieldSingleplayer(ref rnd, 2);
+                DrawShipsOnEnemyFieldSingleplayer(ref _rnd, 2);
             }
 
             for (byte ships = 0; ships < enemyLongShips; ships++) // todo: refactor
             {
-                DrawShipsOnEnemyFieldSingleplayer(ref rnd, 3);
+                DrawShipsOnEnemyFieldSingleplayer(ref _rnd, 3);
             }
-            _enemy.ShipPoints.CollectionChanged += CheckWinLoseCondition;
         }
 
         void InitializeElements()
         {
-            double windowHeight = (Window.Current.Content as Frame).ActualHeight, 
+            double windowHeight = (Window.Current.Content as Frame).ActualHeight,
                 windowWidth = (Window.Current.Content as Frame).ActualWidth;
             var banner = WinLoseBanner;
             Canvas.SetTop(banner, (windowHeight - banner.Height) / 2);
             Canvas.SetLeft(banner, (windowWidth - banner.Width) / 2);
         }
 
-        private void CheckWinLoseCondition(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void CheckWinLoseCondition(IEnumerable<Point> collection)
         {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            var list = collection as List<Point>;
+            if (list.Count == 0)
             {
-                var collection = sender as ObservableCollection<Point>;
-                if (collection.Count == 0)
+                GameInfo.GameStateChange -= ChangeAnnounceText;
+                GameInfo.GameStateChange -= BotAttack;
+                WinLoseBanner.Visibility = Visibility.Visible;
+                // todo: fix for multiplayer
+                if (list == _player.ShipPoints) // compare by reference
                 {
-                    WinLoseBanner.Visibility = Visibility.Visible;
-                    if (collection.Equals(_player.ShipPoints)) // fix for multiplayer
-                    {
-                        LoseSound.Play();
-                        WinLoseText.Text = "You lose!";
-                        _enemy.ShipPoints.CollectionChanged -= CheckWinLoseCondition;
-                    }
-                    else if (collection.Equals(_enemy.ShipPoints))
-                    {
-                        WinSound.Play();
-                        WinLoseText.Text = "You win!";
-                        _player.ShipPoints.CollectionChanged -= CheckWinLoseCondition;
-                    }
+                    LoseSound.Play();
+                    WinLoseText.Text = "You lose!";
+                }
+                else if (list == _enemy.ShipPoints)
+                {
+                    WinSound.Play();
+                    WinLoseText.Text = "You win!";
                 }
             }
         }
@@ -224,7 +216,7 @@ namespace practice6
             Point initPoint = new Point((byte)rnd.Next(0, SeaField._xDim), (byte)rnd.Next(0, SeaField._yDim));
             Point[] pointArr = new Point[] { initPoint };
             double angle = rnd.Next(0, 4) * 90;
-            if (shipSelected > 1) // TODO: refactor
+            if (shipSelected > 1)
             {
                 pointArr = new Point[0];
                 while (!_enemy.IsValidPoint(pointArr))
@@ -241,16 +233,13 @@ namespace practice6
                     pointArr[0] = new Point((byte)rnd.Next(0, SeaField._xDim), (byte)rnd.Next(0, SeaField._yDim));
                 }
             }
-            
+
             _enemy[pointArr] = 's';
-            foreach (Point p in pointArr)
-            {
-                _enemy.ShipPoints.Add(p);
-            }
+            _enemy.ShipPoints.AddRange(pointArr);
             DrawShipOnField(pointArr.ToList(), angle, null, true, shipSelected);
         }
 
-        void ClickEnemyField(object sender, RoutedEventArgs e) // TODO: change
+        void ClickEnemyField(object sender, RoutedEventArgs e)
         {
             if (GameInfo.CurrentGameState == GameInfo.GameState.ATTACK)
             {
@@ -258,17 +247,26 @@ namespace practice6
                 byte row = Convert.ToByte(b.GetValue(Grid.RowProperty));
                 byte col = Convert.ToByte(b.GetValue(Grid.ColumnProperty));
 
-                if (_enemy[row, col] == 's')
+                bool hasHit = false;
+                Point hitPoint = new Point(row, col);
+                if (_enemy.ShipPoints.Contains(hitPoint))
                 {
+                    hasHit = true;
                     (FindButtonByName($"EnemyButton{row}:{col}").Content as Image).Visibility = Visibility.Visible;
-                    _enemy.ShipPoints.Remove(new Point(row, col));
+                    _enemy.ShipPoints.Remove(hitPoint);
+
+                    CheckWinLoseCondition(_enemy.ShipPoints);
                 }
                 else if (_enemy[row, col] == 'x')
                 {
                     return;
                 }
                 _enemy[row, col] = 'x';
-                DrawHit(new Point(row, col), true);
+                DrawHit(hitPoint, true);
+                if (hasHit)
+                {
+                    return;
+                }
                 GameInfo.CurrentGameState = GameInfo.GameState.WAIT;
             }
         }
@@ -315,10 +313,7 @@ namespace practice6
                     }
 
                     _player[pointArr] = 's';
-                    foreach(Point p in pointArr)
-                    {
-                        _player.ShipPoints.Add(p);
-                    }
+                    _player.ShipPoints.AddRange(pointArr);
 
                     double angle = ((RotateTransform)ship.RenderTransform).Angle;
                     DrawShipOnField(points, angle, ship.Source, false, _selectedShip);
@@ -330,8 +325,6 @@ namespace practice6
                     _selectedShip = 0;
                     if (_shortShipsLeft == 0 && _mediumShipsLeft == 0 && _longShipsLeft == 0)
                     {
-                        _player.ShipPoints.CollectionChanged += CheckWinLoseCondition;
-                        _player.ShipPoints.CollectionChanged += PlaySoundWhenCollectionChanges;
                         GameInfo.CurrentGameState = GameInfo.GameState.ATTACK; // fix for two players, choose by random
                     }
                 }
@@ -464,7 +457,7 @@ namespace practice6
             {
                 Width = measurement,
                 Height = measurement,
-                Source = _explosion, // TODO: add source
+                Source = _explosion,
             };
             var currentContent = b.Content as Image;
             Grid grid = new Grid();
@@ -485,7 +478,7 @@ namespace practice6
 
             List<Button> buttons = new List<Button>();
             StringBuilder buttonName = new StringBuilder();
-            
+
             foreach (Point p in drawPlaces)
             {
                 buttonName.Append(isEnemyField ? "EnemyButton" : "PlayerButton");
@@ -524,15 +517,14 @@ namespace practice6
             }
         }
 
-        Button FindButtonByName(string buttonName) 
+        Button FindButtonByName(string buttonName)
         {
             return (Button)this.FindName(buttonName);
         }
 
         void BackToMenu(object sender, RoutedEventArgs e)
         {
-            Frame.GoBack();
-            // (Window.Current.Content as Frame).Navigate(typeof(MainPage)); 
+            (Window.Current.Content as Frame).Navigate(typeof(MainPage));
         }
     }
 }

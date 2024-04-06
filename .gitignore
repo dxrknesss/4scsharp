@@ -9,3 +9,8 @@ obj
 
 # when working in visual studio
 .vs
+
+**/AppPackages
+ConsoleApp1/*
+
+**/*.pfx

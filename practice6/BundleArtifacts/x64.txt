@@ -1,0 +1,2 @@
+MainPackage=C:\Users\Administrator\source\repos\4scsharp\practice6\bin\x64\Release\practice6_1.0.3.0_x64.msix
+SymbolPackage=C:\Users\Administrator\source\repos\4scsharp\practice6\obj\x64\Release\Symbols\practice6_1.0.3.0_x64.appxsym

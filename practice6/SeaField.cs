@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 
 namespace practice6
 {
@@ -6,11 +6,11 @@ namespace practice6
     {
         public static byte _xDim = 7, _yDim = 7;
         char[,] _field = new char[_xDim, _yDim];
-        public ObservableCollection<Point> ShipPoints;
+        public List<Point> ShipPoints;
 
         public SeaField()
         {
-            ShipPoints = new ObservableCollection<Point>();
+            ShipPoints = new List<Point>();
         }
 
         public char this[byte x, byte y]
