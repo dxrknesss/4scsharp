@@ -48,10 +48,11 @@ namespace practice6
             if (GameInfo.CurrentGameType == GameInfo.GameType.SINGLE)
             {
                 InitializeEnemyField();
+                GameInfo.GameStateChange += BotAttack;
             }
             InitializeElements();
             GameInfo.GameStateChange += ChangeAnnounceText;
-            GameInfo.GameStateChange += BotAttack;
+            
 
         }
 

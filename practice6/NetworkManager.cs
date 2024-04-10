@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml;
 
 namespace practice6
 {
@@ -14,6 +16,8 @@ namespace practice6
     {
         public static UdpClient Client;
         public static string LobbyName;
+        public static IPEndPoint RemoteConnectionPoint;
+        public static string BroadcastAddress = "192.168.194.255";
 
         public enum PacketType
         {
@@ -32,7 +36,8 @@ namespace practice6
                 throw exception;
             }
 
-            Client = new UdpClient(remotePoint);
+            Client = new UdpClient();
+            RemoteConnectionPoint = remotePoint;
             Client.EnableBroadcast = true;
         }
 
@@ -42,50 +47,107 @@ namespace practice6
             Client.EnableBroadcast = true;
         }
 
-        public static void SendHello()
+        public static void SendHello(bool sync) // todo: refactor to the form of loosely coupled method
         {
-            SendPacketType(PacketType.PT_HELLO, PacketType.PT_ACK);
+            if (sync) // todo: rewrite with delegates
+            {
+                SendPacketTypeSync(PacketType.PT_HELLO, PacketType.PT_ACK, RemoteConnectionPoint);
+            } 
+            else
+            {
+                SendPacketType(PacketType.PT_HELLO, PacketType.PT_ACK, RemoteConnectionPoint);
+            }    
         }
 
-        async public static void ReceiveHello()
+        async public static Task<bool> ReceivePacketAsync(PacketType desiredType)
         {
             var result = await Client.ReceiveAsync();
             var endpoint = result.RemoteEndPoint;
             var bufferDeserialized = JsonSerializer.Deserialize<PacketType>(result.Buffer);
 
-            
-            if (bufferDeserialized == PacketType.PT_HELLO)
+            if (bufferDeserialized == desiredType)
             {
-                SendPacketType(PacketType.PT_ACK, PacketType.PT_CHANGESTATE, endpoint);
+                SendPacketType(PacketType.PT_ACK, null, endpoint); // TODO: refactor all the shit outta here
+                return true;
+            }
+            return false;
+        }
+
+        async private static void SendPacketType(PacketType request, PacketType? desiredResponse,
+            IPEndPoint endpoint)
+        {
+            byte[] payload = JsonSerializer.SerializeToUtf8Bytes<PacketType>(request);
+            int timeout = 1500;
+            using var cst = new CancellationTokenSource(timeout);
+
+            await Client.SendAsync(payload, payload.Length, endpoint);
+
+            try
+            {
+                var result = await Client.ReceiveAsync();
+                PacketType pt = JsonSerializer.Deserialize<PacketType>(result.Buffer);
+                if (desiredResponse != null && pt != desiredResponse)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                if (endpoint.Address.ToString().Equals(BroadcastAddress))
+                {
+                    RemoteConnectionPoint = result.RemoteEndPoint;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                SendPacketType(request, desiredResponse, endpoint);
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
         }
 
-        async private static void SendPacketType(PacketType request, PacketType desiredResponse,
-            IPEndPoint endpoint = null)
+        private static bool SendPacketTypeSync(PacketType request, PacketType desiredResponse,
+            IPEndPoint endpoint)
         {
             byte[] payload = JsonSerializer.SerializeToUtf8Bytes<PacketType>(request);
-            int timeout = 2000;
-            using (var cst = new CancellationTokenSource(timeout))
-            {
-                await Client.SendAsync(payload, payload.Length, endpoint ?? (IPEndPoint)Client.Client.RemoteEndPoint);
+            int timeout = 1500;
 
-                try
+            Client.Send(payload, payload.Length, endpoint);
+
+            var cts = new CancellationTokenSource(timeout);
+            using Task task = Task.Run(async () =>
+            {
+                // byte[] result = Client.Receive(ref endpoint);
+                var result = await Client.ReceiveAsync();
+
+                //PacketType pt = JsonSerializer.Deserialize<PacketType>(result);
+                PacketType pt = JsonSerializer.Deserialize<PacketType>(result.Buffer);
+                if (cts.IsCancellationRequested)
                 {
-                    var result = await Client.ReceiveAsync();
-                    PacketType pt = JsonSerializer.Deserialize<PacketType>(result.Buffer);
-                    if (pt != desiredResponse)
-                    {
-                        throw new InvalidOperationException();
-                    }
+                    cts.Token.ThrowIfCancellationRequested();
                 }
-                catch (OperationCanceledException)
+
+                if (pt != desiredResponse)
                 {
-                    SendPacketType(request, desiredResponse);
+                    throw new InvalidOperationException();
                 }
-                catch (InvalidOperationException)
-                {
-                    return;
-                }
+            }, cts.Token);
+
+            try
+            {
+                task.Wait(cts.Token);
+                return true;
+            }
+            catch (OperationCanceledException)
+            {
+                cts.Cancel();
+                // SendPacketTypeSync(request, desiredResponse, endpoint);
+                // todo: display error message!
+                return false;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
         }
     }
