@@ -15,13 +15,17 @@ namespace practice6
     internal class NetworkManager
     {
         public static UdpClient Client;
-        public static string LobbyName;
+        public static PeerType CurrentPeerType;
         public static IPEndPoint RemoteConnectionPoint;
-        public static string BroadcastAddress = "192.168.194.255";
 
         public enum PacketType
         {
-            PT_HELLO, PT_ACK, PT_CHANGESTATE, PT_POINT
+            PT_HELLO, PT_ACK, PT_POINT, PT_READY, PT_CHNST
+        }
+
+        public enum PeerType 
+        {
+            HOST, CLIENT
         }
 
         public static void SetClient(string ipAddr, int port)
@@ -36,27 +40,13 @@ namespace practice6
                 throw exception;
             }
 
-            Client = new UdpClient();
+            Client = new UdpClient() { EnableBroadcast = true };
             RemoteConnectionPoint = remotePoint;
-            Client.EnableBroadcast = true;
         }
 
         public static void SetClient(int port)
         {
-            Client = new UdpClient(port);
-            Client.EnableBroadcast = true;
-        }
-
-        public static void SendHello(bool sync) // todo: refactor to the form of loosely coupled method
-        {
-            if (sync) // todo: rewrite with delegates
-            {
-                SendPacketTypeSync(PacketType.PT_HELLO, PacketType.PT_ACK, RemoteConnectionPoint);
-            } 
-            else
-            {
-                SendPacketType(PacketType.PT_HELLO, PacketType.PT_ACK, RemoteConnectionPoint);
-            }    
+            Client = new UdpClient(port) { EnableBroadcast = true };
         }
 
         async public static Task<bool> ReceivePacketAsync(PacketType desiredType)
@@ -67,21 +57,34 @@ namespace practice6
 
             if (bufferDeserialized == desiredType)
             {
-                SendPacketType(PacketType.PT_ACK, null, endpoint); // TODO: refactor all the shit outta here
+                await SendPacketTypeAsync(PacketType.PT_ACK, null, endpoint); // TODO: refactor all the shit outta here
                 return true;
             }
             return false;
         }
 
-        async private static void SendPacketType(PacketType request, PacketType? desiredResponse,
+        public static bool ReceivePacketSync(PacketType desiredType)
+        {
+            var result = Client.Receive(ref RemoteConnectionPoint);
+            var bufferDeserialized = JsonSerializer.Deserialize<PacketType>(result);
+
+            if (bufferDeserialized == desiredType)
+            {
+                SendPacketTypeSync(PacketType.PT_ACK, null, RemoteConnectionPoint); // TODO: refactor all the shit outta here
+                return true;
+            }
+            return false;
+        }
+
+        async internal static Task<bool> SendPacketTypeAsync(PacketType request, PacketType? desiredResponse,
             IPEndPoint endpoint)
         {
-            byte[] payload = JsonSerializer.SerializeToUtf8Bytes<PacketType>(request);
+            byte[] payload = JsonSerializer.SerializeToUtf8Bytes(request);
             int timeout = 1500;
-            using var cst = new CancellationTokenSource(timeout);
 
             await Client.SendAsync(payload, payload.Length, endpoint);
 
+            using var cst = new CancellationTokenSource(timeout);
             try
             {
                 var result = await Client.ReceiveAsync();
@@ -91,22 +94,15 @@ namespace practice6
                     throw new InvalidOperationException();
                 }
 
-                if (endpoint.Address.ToString().Equals(BroadcastAddress))
-                {
-                    RemoteConnectionPoint = result.RemoteEndPoint;
-                }
+                return true;
             }
-            catch (OperationCanceledException)
+            catch (Exception)
             {
-                SendPacketType(request, desiredResponse, endpoint);
-            }
-            catch (InvalidOperationException)
-            {
-                throw;
+                return false;
             }
         }
 
-        private static bool SendPacketTypeSync(PacketType request, PacketType desiredResponse,
+        internal static bool SendPacketTypeSync(PacketType request, PacketType? desiredResponse,
             IPEndPoint endpoint)
         {
             byte[] payload = JsonSerializer.SerializeToUtf8Bytes<PacketType>(request);
@@ -114,40 +110,33 @@ namespace practice6
 
             Client.Send(payload, payload.Length, endpoint);
 
-            var cts = new CancellationTokenSource(timeout);
-            using Task task = Task.Run(async () =>
+            try
             {
-                // byte[] result = Client.Receive(ref endpoint);
-                var result = await Client.ReceiveAsync();
-
-                //PacketType pt = JsonSerializer.Deserialize<PacketType>(result);
-                PacketType pt = JsonSerializer.Deserialize<PacketType>(result.Buffer);
-                if (cts.IsCancellationRequested)
+                Task<byte[]> receiveRes = Task.Run(() =>
                 {
-                    cts.Token.ThrowIfCancellationRequested();
+                    var result = Client.Receive(ref endpoint);
+                    return result;
+                });
+
+                Task.WaitAny(new Task[] { receiveRes, Task.Delay(1500) });
+
+                if (!receiveRes.IsCompleted)
+                {
+                    throw new OperationCanceledException();
                 }
+                PacketType pt = JsonSerializer.Deserialize<PacketType>(receiveRes.Result);
 
                 if (pt != desiredResponse)
                 {
                     throw new InvalidOperationException();
                 }
-            }, cts.Token);
-
-            try
-            {
-                task.Wait(cts.Token);
                 return true;
             }
-            catch (OperationCanceledException)
+            catch (Exception)
             {
-                cts.Cancel();
                 // SendPacketTypeSync(request, desiredResponse, endpoint);
                 // todo: display error message!
                 return false;
-            }
-            catch (InvalidOperationException)
-            {
-                throw;
             }
         }
     }

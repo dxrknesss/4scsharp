@@ -64,20 +64,11 @@ namespace practice6
             JoinGameRelativePanel.Visibility = vis;
         }
 
-        private async void HostGame(object sender, RoutedEventArgs e)
+        private void HostGame(object sender, RoutedEventArgs e)
         {
-            if (NetworkManager.Client == null)
-            {
-                NetworkManager.SetClient(5555);
-            }
+            NetworkManager.SetClient(5555);
 
             (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
-            if (await NetworkManager.ReceivePacketAsync(NetworkManager.PacketType.PT_HELLO))
-            {
-                GameInfo.PlayerCount = 2;
-                GameInfo.CurrentGameState = GameInfo.GameState.PLACE_SHIPS;
-            }
-            
         }
 
         private void JoinGame(object sender, RoutedEventArgs e)
@@ -91,16 +82,14 @@ namespace practice6
             {
                 NetworkManager.SetClient(InputIPJoin.Text, 5555);
             }
-            else if (InputLobbyNameJoin.Text.Length != 0) // todo: implement
-            {
-                NetworkManager.SetClient(NetworkManager.BroadcastAddress, 5555);
-            }
 
-            NetworkManager.SendHello(true); // todo: refactor
-            GameInfo.CurrentGameType = GameInfo.GameType.MULTI;
-            GameInfo.PlayerCount = 2;
-            (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
-            GameInfo.CurrentGameState = GameInfo.GameState.PLACE_SHIPS;
+            if (NetworkManager.SendPacketTypeSync(
+                NetworkManager.PacketType.PT_HELLO, NetworkManager.PacketType.PT_ACK,
+                NetworkManager.RemoteConnectionPoint))
+            {
+                GameInfo.PlayerCount = 2;
+                (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
+            }
         }
 
         void ChangeButtonVisibility(Visibility visibility)

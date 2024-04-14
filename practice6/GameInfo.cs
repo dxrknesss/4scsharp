@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace practice6
 {
-    internal class GameInfo
+    internal class GameInfo // todo: rename to GameUtils or somethings like this
     {
         static GameInfo _instance;
         static GameState _gameState;

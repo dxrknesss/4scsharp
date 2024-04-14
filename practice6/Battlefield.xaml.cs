@@ -27,16 +27,17 @@ namespace practice6
 
     public sealed partial class Battlefield : Page
     {
-        SeaField _player;
-        SeaField _enemy;
+        readonly SeaField _player;
+        readonly SeaField _enemy;
         byte _shortShipsLeft = 4, _mediumShipsLeft = 2, _longShipsLeft = 2;
         byte _selectedShip = 0;
         bool _hasShipSelected = false;
-        BitmapImage _longShip1 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship1.png")),
+        readonly BitmapImage _longShip1 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship1.png")),
                 _longShip2 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship2.png")),
                 _longShip3 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship3.png")),
                 _explosion = new BitmapImage(new Uri("ms-appx:///Assets/Textures/explosion.png"));
         Random _rnd = new Random();
+        bool _isEnemyReady = false;
 
         public Battlefield()
         {
@@ -44,16 +45,22 @@ namespace practice6
             _enemy = new SeaField();
             this.InitializeComponent();
             InitializeFields();
-            InitializeAnnounce();
-            if (GameInfo.CurrentGameType == GameInfo.GameType.SINGLE)
+            GameInfo.GameStateChange += ChangeAnnounceText;
+            InitializeElements();
+
+            var curType = GameInfo.CurrentGameType;
+            if (curType == GameInfo.GameType.SINGLE)
             {
                 InitializeEnemyField();
                 GameInfo.GameStateChange += BotAttack;
+                GameInfo.CurrentGameState = GameInfo.GameState.PLACE_SHIPS;
             }
-            InitializeElements();
-            GameInfo.GameStateChange += ChangeAnnounceText;
-            
-
+            else
+            {
+                GameInfo.CurrentGameState = GameInfo.PlayerCount == 1 ?
+                    GameInfo.GameState.WAIT_FOR_PLAYER : GameInfo.GameState.PLACE_SHIPS;
+                InitializeNetworkPart();
+            }
         }
 
         void InitializeFields()
@@ -108,26 +115,6 @@ namespace practice6
             name.Clear();
 
             return button;
-        }
-
-        void InitializeAnnounce()
-        {
-            var gameType = GameInfo.CurrentGameType;
-            if (gameType == GameInfo.GameType.MULTI)
-            {
-                if (GameInfo.PlayerCount == 1)
-                {
-                    LeftAnnounce.Text = GameInfo.AnnounceTexts[GameInfo.GameState.WAIT_FOR_PLAYER];
-                }
-                else // TODO: add functionality
-                {
-
-                }
-            }
-            else
-            {
-                LeftAnnounce.Text = GameInfo.AnnounceTexts[GameInfo.GameState.PLACE_SHIPS];
-            }
         }
 
         void ChangeAnnounceText()
@@ -190,7 +177,27 @@ namespace practice6
             Canvas.SetLeft(banner, (windowWidth - banner.Width) / 2);
         }
 
-        private void CheckWinLoseCondition(IEnumerable<Point> collection)
+        async void InitializeNetworkPart()
+        {
+            await Task.Run(() =>
+            {
+                while (!NetworkManager.ReceivePacketSync(NetworkManager.PacketType.PT_HELLO))
+                { }
+                GameInfo.PlayerCount = 2;
+            });
+
+            GameInfo.CurrentGameState = GameInfo.GameState.PLACE_SHIPS;
+
+            await Task.Run(async () =>
+            {
+                while (!_isEnemyReady)
+                {
+                    _isEnemyReady = await NetworkManager.ReceivePacketAsync(NetworkManager.PacketType.PT_READY);
+                }
+            });
+        }
+
+        private void CheckWinLoseCondition(IEnumerable<Point> collection) // todo: refactor to gameinfo class
         {
             var list = collection as List<Point>;
             if (list.Count == 0)
@@ -326,7 +333,27 @@ namespace practice6
                     _selectedShip = 0;
                     if (_shortShipsLeft == 0 && _mediumShipsLeft == 0 && _longShipsLeft == 0)
                     {
-                        GameInfo.CurrentGameState = GameInfo.GameState.ATTACK; // fix for two players, choose by random
+                        if (GameInfo.CurrentGameType == GameInfo.GameType.MULTI)
+                        {
+                            GameInfo.CurrentGameState = GameInfo.GameState.WAIT_FOR_PLAYER;
+                            Task.Run(() =>
+                            {
+                                NetworkManager.SendPacketTypeSync(
+                                    NetworkManager.PacketType.PT_READY,
+                                    NetworkManager.PacketType.PT_ACK,
+                                    NetworkManager.RemoteConnectionPoint
+                                );
+
+                                while (!_isEnemyReady)
+                                {}
+
+                                //NetworkManager.DecideWhoAttacks();
+                            });
+                        }
+                        else
+                        {
+                            GameInfo.CurrentGameState = GameInfo.GameState.ATTACK;
+                        }
                     }
                 }
             }

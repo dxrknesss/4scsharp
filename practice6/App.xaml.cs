@@ -96,10 +96,5 @@ namespace practice6
             var deferral = e.SuspendingOperation.GetDeferral();
             deferral.Complete();
         }
-
-        private void OnButtonHover(object sender, PointerRoutedEventArgs e)
-        {
-            
-        }
     }
 }
