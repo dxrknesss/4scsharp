@@ -21,6 +21,8 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Drawing;
+using System.Text.Json;
+using System.Buffers.Binary;
 
 namespace practice6
 {
@@ -36,7 +38,7 @@ namespace practice6
                 _longShip2 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship2.png")),
                 _longShip3 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship3.png")),
                 _explosion = new BitmapImage(new Uri("ms-appx:///Assets/Textures/explosion.png"));
-        Random _rnd = new Random();
+        Random _rnd;
         bool _isEnemyReady = false;
 
         public Battlefield()
@@ -51,13 +53,14 @@ namespace practice6
             var curType = GameInfo.CurrentGameType;
             if (curType == GameInfo.GameType.SINGLE)
             {
+                _rnd = new Random();
                 InitializeEnemyField();
                 GameInfo.GameStateChange += BotAttack;
                 GameInfo.CurrentGameState = GameInfo.GameState.PLACE_SHIPS;
             }
             else
             {
-                GameInfo.CurrentGameState = GameInfo.PlayerCount == 1 ?
+                GameInfo.CurrentGameState = !NetworkManager.ConnectionEstablished ?
                     GameInfo.GameState.WAIT_FOR_PLAYER : GameInfo.GameState.PLACE_SHIPS;
                 InitializeNetworkPart();
             }
@@ -152,20 +155,29 @@ namespace practice6
         {
             byte enemyShips = _shortShipsLeft, enemyMidShips = _mediumShipsLeft, enemyLongShips = _longShipsLeft;
 
-            for (byte ships = 0; ships < enemyShips; ships++)
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                DrawShipsOnEnemyFieldSingleplayer(ref _rnd);
-            }
+                for (byte ships = 0; ships < enemyShips; ships++)
+                {
+                    DrawShipsOnEnemyFieldSingleplayer(ref _rnd);
+                }
+            });
 
-            for (byte ships = 0; ships < enemyMidShips; ships++)
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                DrawShipsOnEnemyFieldSingleplayer(ref _rnd, 2);
-            }
+                for (byte ships = 0; ships < enemyMidShips; ships++)
+                {
+                    DrawShipsOnEnemyFieldSingleplayer(ref _rnd, 2);
+                }
+            });
 
-            for (byte ships = 0; ships < enemyLongShips; ships++) // todo: refactor
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                DrawShipsOnEnemyFieldSingleplayer(ref _rnd, 3);
-            }
+                for (byte ships = 0; ships < enemyLongShips; ships++)
+                {
+                    DrawShipsOnEnemyFieldSingleplayer(ref _rnd, 3);
+                }
+            });
         }
 
         void InitializeElements()
@@ -175,24 +187,79 @@ namespace practice6
             var banner = WinLoseBanner;
             Canvas.SetTop(banner, (windowHeight - banner.Height) / 2);
             Canvas.SetLeft(banner, (windowWidth - banner.Width) / 2);
+
+            // todo: expand
         }
 
         async void InitializeNetworkPart()
         {
+            if (NetworkManager.CurrentPeerType == NetworkManager.PeerType.HOST)
+            {
+                await Task.Run(() =>
+                {
+                    byte[] temp = new byte[0];
+                    while (!NetworkManager.ReceivePacketSync(NetworkManager.PacketType.PT_HELLO, out temp))
+                    { }
+                });
+                NetworkManager.ConnectionEstablished = true;
+                GameInfo.CurrentGameState = GameInfo.GameState.PLACE_SHIPS;
+            }
+
             await Task.Run(() =>
             {
-                while (!NetworkManager.ReceivePacketSync(NetworkManager.PacketType.PT_HELLO))
-                { }
-                GameInfo.PlayerCount = 2;
+                if (NetworkManager.CurrentPeerType == NetworkManager.PeerType.HOST)
+                {
+                    int currentDateTime = Convert.ToInt32(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+                    byte[] headerPayload = new byte[] { (byte)NetworkManager.PacketType.PT_RNDSD },
+                    intPayload = JsonSerializer.SerializeToUtf8Bytes(currentDateTime);
+
+                    // todo: maybe refactor to some struct in NetworkManager class?
+                    byte[] payload = new byte[headerPayload.Length + intPayload.Length];
+                    headerPayload.CopyTo(payload, 0);
+                    intPayload.CopyTo(payload, headerPayload.Length);
+
+                    while (!NetworkManager.SendDataSync(
+                        payload,
+                        NetworkManager.PacketType.PT_ACK,
+                        NetworkManager.RemoteConnectionPoint))
+                    { }
+
+                    _rnd = new Random(currentDateTime);
+                }
+                else
+                {
+                    byte[] payload;
+                    while (!NetworkManager.ReceivePacketSync(NetworkManager.PacketType.PT_RNDSD, out payload))
+                    {}
+
+                    int currentDateTime = JsonSerializer.Deserialize<int>(payload.Skip(1).ToArray());
+                    _rnd = new Random(currentDateTime);
+                }
             });
 
-            GameInfo.CurrentGameState = GameInfo.GameState.PLACE_SHIPS;
-
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
+                byte[] response;
                 while (!_isEnemyReady)
                 {
-                    _isEnemyReady = await NetworkManager.ReceivePacketAsync(NetworkManager.PacketType.PT_READY);
+                    bool res = NetworkManager.ReceivePacketSync(NetworkManager.PacketType.PT_READY, out response);
+                    if (res) // if enemy is ready, then listen for their ship points array
+                    {
+                        string json = Encoding.UTF8.GetString(response.Skip(1).ToArray());
+                        _enemy.ShipPoints = JsonSerializer.Deserialize<List<Point>>(json);
+                    }
+                    _isEnemyReady = res;
+                }
+            });
+
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () =>
+            {
+                Random rnd = new Random();
+                double angle;
+                foreach (Point p in _enemy.ShipPoints)
+                {
+                    angle = rnd.Next(0, 4) * 90;
+                    DrawShipOnField(new List<Point> { p }, angle, null, true, 1);
                 }
             });
         }
@@ -247,16 +314,38 @@ namespace practice6
             DrawShipOnField(pointArr.ToList(), angle, null, true, shipSelected);
         }
 
-        void ClickEnemyField(object sender, RoutedEventArgs e)
+        async void ClickEnemyField(object sender, RoutedEventArgs e)
         {
             if (GameInfo.CurrentGameState == GameInfo.GameState.ATTACK)
             {
                 Button b = sender as Button;
-                byte row = Convert.ToByte(b.GetValue(Grid.RowProperty));
-                byte col = Convert.ToByte(b.GetValue(Grid.ColumnProperty));
-
+                byte row = Convert.ToByte(b.GetValue(Grid.RowProperty)),
+                    col = Convert.ToByte(b.GetValue(Grid.ColumnProperty));
                 bool hasHit = false;
                 Point hitPoint = new Point(row, col);
+
+                if (_enemy[hitPoint.X, hitPoint.Y] == 'x')
+                {
+                    return;
+                }
+
+                await Task.Run(() =>
+                {
+                    // todo: refactor to network manager class
+                    byte[] headerPayload = new byte[] { (byte)NetworkManager.PacketType.PT_POINT },
+                    pointPayload = JsonSerializer.SerializeToUtf8Bytes(hitPoint);
+
+                    byte[] payload = new byte[headerPayload.Length + pointPayload.Length];
+                    headerPayload.CopyTo(payload, 0);
+                    pointPayload.CopyTo(payload, headerPayload.Length);
+
+                    NetworkManager.SendDataSync(
+                        payload, 
+                        //NetworkManager.PacketType.PT_ACK, 
+                        null,
+                        NetworkManager.RemoteConnectionPoint);
+                });
+
                 if (_enemy.ShipPoints.Contains(hitPoint))
                 {
                     hasHit = true;
@@ -265,17 +354,10 @@ namespace practice6
 
                     CheckWinLoseCondition(_enemy.ShipPoints);
                 }
-                else if (_enemy[row, col] == 'x')
-                {
-                    return;
-                }
+
                 _enemy[row, col] = 'x';
                 DrawHit(hitPoint, true);
-                if (hasHit)
-                {
-                    return;
-                }
-                GameInfo.CurrentGameState = GameInfo.GameState.WAIT;
+                GameInfo.CurrentGameState = hasHit ? GameInfo.GameState.ATTACK : GameInfo.GameState.WAIT;
             }
         }
 
@@ -336,18 +418,66 @@ namespace practice6
                         if (GameInfo.CurrentGameType == GameInfo.GameType.MULTI)
                         {
                             GameInfo.CurrentGameState = GameInfo.GameState.WAIT_FOR_PLAYER;
-                            Task.Run(() =>
+                            var sendReady = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                             {
-                                NetworkManager.SendPacketTypeSync(
-                                    NetworkManager.PacketType.PT_READY,
-                                    NetworkManager.PacketType.PT_ACK,
+                                byte[] headerPayload = new byte[] { (byte)NetworkManager.PacketType.PT_READY },
+                                arrayPayload = JsonSerializer.SerializeToUtf8Bytes<List<Point>>(_player.ShipPoints);
+
+                                byte[] payload = new byte[headerPayload.Length + arrayPayload.Length];
+                                headerPayload.CopyTo(payload, 0);
+                                arrayPayload.CopyTo(payload, headerPayload.Length);
+
+                                while (!NetworkManager.SendDataSync(
+                                    payload,
+                                    null,
                                     NetworkManager.RemoteConnectionPoint
-                                );
+                                )) { }
 
                                 while (!_isEnemyReady)
-                                {}
+                                {
+                                    await Task.Delay(500);
+                                }
 
-                                //NetworkManager.DecideWhoAttacks();
+                                NetworkManager.PeerType attacksFirst = (NetworkManager.PeerType)((byte)_rnd.Next(0, 2));
+                                if (NetworkManager.CurrentPeerType == attacksFirst)
+                                {
+                                    GameInfo.CurrentGameState = GameInfo.GameState.ATTACK;
+                                }
+                                else
+                                {
+                                    GameInfo.CurrentGameState = GameInfo.GameState.WAIT;
+                                }
+                            });
+
+                            Task.Run(async () =>
+                            {
+                                while (sendReady.Status != AsyncStatus.Completed)
+                                {
+                                    await Task.Delay(2000);
+                                }
+
+                                while (true)
+                                {
+                                    byte[] response;
+                                    while (NetworkManager.ReceivePacketSync(NetworkManager.PacketType.PT_POINT, out response))
+                                    {
+                                        Point point = JsonSerializer.Deserialize<Point>(response.Skip(1).ToArray());
+
+                                        await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                                        {
+                                            bool hasHit = false;
+                                            if (_player.ShipPoints.Contains(point))
+                                            {
+                                                _player.ShipPoints.Remove(point);
+                                                hasHit = true;
+                                                CheckWinLoseCondition(_player.ShipPoints);
+                                            }
+                                            DrawHit(point, false);
+                                            _player[point.X, point.Y] = 'x';
+                                            GameInfo.CurrentGameState = hasHit ? GameInfo.GameState.WAIT : GameInfo.GameState.ATTACK;
+                                        });
+                                    }
+                                }
                             });
                         }
                         else
@@ -408,7 +538,7 @@ namespace practice6
 
         void ClickTakeShip(object sender, PointerRoutedEventArgs e)
         {
-            if (_hasShipSelected)
+            if (_hasShipSelected || GameInfo.CurrentGameState != GameInfo.GameState.PLACE_SHIPS)
             {
                 return;
             }

@@ -16,80 +16,103 @@ namespace practice6
     {
         public static UdpClient Client;
         public static PeerType CurrentPeerType;
+        public static bool ConnectionEstablished;
         public static IPEndPoint RemoteConnectionPoint;
+        readonly static int _timeout = 1000;
 
-        public enum PacketType
+        public enum PacketType : byte
         {
-            PT_HELLO, PT_ACK, PT_POINT, PT_READY, PT_CHNST
+            PT_HELLO, PT_ACK, PT_POINT, PT_READY, PT_CHNST, PT_RNDSD
         }
 
-        public enum PeerType 
+        public enum PeerType : byte
         {
             HOST, CLIENT
         }
 
         public static void SetClient(string ipAddr, int port)
         {
-            IPEndPoint remotePoint;
+            IPEndPoint remotePoint, remotePoint2;
             try
             {
                 remotePoint = new IPEndPoint(IPAddress.Parse(ipAddr), port);
+                remotePoint2 = new IPEndPoint(IPAddress.Parse(ipAddr), port+1);
             }
             catch (FormatException exception)
             {
                 throw exception;
             }
 
-            Client = new UdpClient() { EnableBroadcast = true };
+            Client ??= new UdpClient() { EnableBroadcast = true };
             RemoteConnectionPoint = remotePoint;
         }
 
         public static void SetClient(int port)
         {
-            Client = new UdpClient(port) { EnableBroadcast = true };
+            Client ??= new UdpClient(port) { EnableBroadcast = true };
         }
 
-        async public static Task<bool> ReceivePacketAsync(PacketType desiredType)
+        async public static Task<bool> ReceivePacketAsync(byte desiredHeader)
         {
             var result = await Client.ReceiveAsync();
             var endpoint = result.RemoteEndPoint;
-            var bufferDeserialized = JsonSerializer.Deserialize<PacketType>(result.Buffer);
+            byte[] bufferDeserialized = result.Buffer;
 
-            if (bufferDeserialized == desiredType)
+            if (desiredHeader == bufferDeserialized[0])
             {
-                await SendPacketTypeAsync(PacketType.PT_ACK, null, endpoint); // TODO: refactor all the shit outta here
+                await SendDataAsync(new byte[] { (byte)PacketType.PT_ACK }, null, endpoint);
                 return true;
             }
             return false;
         }
 
-        public static bool ReceivePacketSync(PacketType desiredType)
+        public static bool ReceivePacketSync(PacketType desiredHeader, out byte[] payload)
         {
-            var result = Client.Receive(ref RemoteConnectionPoint);
-            var bufferDeserialized = JsonSerializer.Deserialize<PacketType>(result);
+            byte[] result = Client.Receive(ref RemoteConnectionPoint);
+            PacketType deserializedHeader = (PacketType)result[0];
+            payload = result;
 
-            if (bufferDeserialized == desiredType)
+            if (deserializedHeader == desiredHeader)
             {
-                SendPacketTypeSync(PacketType.PT_ACK, null, RemoteConnectionPoint); // TODO: refactor all the shit outta here
+                SendDataSync(new byte[] { (byte)PacketType.PT_ACK }, null, RemoteConnectionPoint);
                 return true;
             }
             return false;
         }
 
-        async internal static Task<bool> SendPacketTypeAsync(PacketType request, PacketType? desiredResponse,
+
+        public static bool ReceivePacketSync(PacketType desiredHeader, out byte[] payload, bool sendAck)
+        {
+            byte[] result = Client.Receive(ref RemoteConnectionPoint);
+            PacketType deserializedHeader = (PacketType)result[0];
+            payload = result;
+
+            if (deserializedHeader == desiredHeader)
+            {
+                if (sendAck)
+                {
+                    SendDataSync(new byte[] { (byte)PacketType.PT_ACK }, null, RemoteConnectionPoint);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        async internal static Task<bool> SendDataAsync(byte[] payload, PacketType? desiredResponse,
             IPEndPoint endpoint)
         {
-            byte[] payload = JsonSerializer.SerializeToUtf8Bytes(request);
-            int timeout = 1500;
-
             await Client.SendAsync(payload, payload.Length, endpoint);
 
-            using var cst = new CancellationTokenSource(timeout);
+            if(desiredResponse == null)
+            {
+                return true;
+            }
+
             try
             {
                 var result = await Client.ReceiveAsync();
-                PacketType pt = JsonSerializer.Deserialize<PacketType>(result.Buffer);
-                if (desiredResponse != null && pt != desiredResponse)
+                PacketType pt = (PacketType)result.Buffer[0];
+                if (pt != desiredResponse)
                 {
                     throw new InvalidOperationException();
                 }
@@ -102,13 +125,15 @@ namespace practice6
             }
         }
 
-        internal static bool SendPacketTypeSync(PacketType request, PacketType? desiredResponse,
+        internal static bool SendDataSync(byte[] payload, PacketType? desiredResponse,
             IPEndPoint endpoint)
         {
-            byte[] payload = JsonSerializer.SerializeToUtf8Bytes<PacketType>(request);
-            int timeout = 1500;
-
             Client.Send(payload, payload.Length, endpoint);
+
+            if (desiredResponse == null)
+            {
+                return true;
+            }
 
             try
             {
@@ -118,13 +143,13 @@ namespace practice6
                     return result;
                 });
 
-                Task.WaitAny(new Task[] { receiveRes, Task.Delay(1500) });
+                Task.WaitAny(new Task[] { receiveRes, Task.Delay(_timeout) });
 
                 if (!receiveRes.IsCompleted)
                 {
                     throw new OperationCanceledException();
                 }
-                PacketType pt = JsonSerializer.Deserialize<PacketType>(receiveRes.Result);
+                PacketType pt = (PacketType)receiveRes.Result[0];
 
                 if (pt != desiredResponse)
                 {
@@ -134,8 +159,6 @@ namespace practice6
             }
             catch (Exception)
             {
-                // SendPacketTypeSync(request, desiredResponse, endpoint);
-                // todo: display error message!
                 return false;
             }
         }

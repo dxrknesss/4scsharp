@@ -12,7 +12,7 @@ namespace practice6
         static GameState _gameState;
         public static Dictionary<GameState, string> AnnounceTexts;
 
-        public static byte PlayerCount;
+        //public static byte PlayerCount;
         public static GameType CurrentGameType;
         public static Action GameStateChange;
         public static GameState CurrentGameState 
@@ -41,12 +41,12 @@ namespace practice6
             return _instance;
         }
 
-        public enum GameState
+        public enum GameState : byte
         {
             WAIT_FOR_PLAYER, PLACE_SHIPS, ATTACK, WAIT
         }
 
-        public enum GameType
+        public enum GameType : byte
         {
             SINGLE, MULTI
         }

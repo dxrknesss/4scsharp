@@ -47,7 +47,7 @@ namespace practice6
             ChangeButtonVisibility(invis);
 
             GameInfo.CurrentGameType = GameInfo.GameType.MULTI;
-            GameInfo.PlayerCount = 1;
+            NetworkManager.CurrentPeerType = NetworkManager.PeerType.HOST;
 
             MessageGrid.Visibility = vis;
             HostGameRelativePanel.Visibility = vis;
@@ -58,6 +58,8 @@ namespace practice6
         {
             Visibility vis = Visibility.Visible, invis = Visibility.Collapsed;
             ChangeButtonVisibility(invis);
+
+            NetworkManager.CurrentPeerType = NetworkManager.PeerType.CLIENT;
 
             MessageGrid.Visibility = vis;
             JoinGameButton.Visibility = vis;
@@ -83,11 +85,11 @@ namespace practice6
                 NetworkManager.SetClient(InputIPJoin.Text, 5555);
             }
 
-            if (NetworkManager.SendPacketTypeSync(
+            if (NetworkManager.SendDataSync(
                 NetworkManager.PacketType.PT_HELLO, NetworkManager.PacketType.PT_ACK,
                 NetworkManager.RemoteConnectionPoint))
             {
-                GameInfo.PlayerCount = 2;
+                NetworkManager.ConnectionEstablished = true;
                 (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
             }
         }

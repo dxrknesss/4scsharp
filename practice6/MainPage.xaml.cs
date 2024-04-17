@@ -54,7 +54,6 @@ namespace practice6
         private void OnSPClick(object sender, RoutedEventArgs e)
         {
             GameInfo.CurrentGameType = GameInfo.GameType.SINGLE;
-            GameInfo.PlayerCount = 0;
             GameInfo.CurrentGameState = GameInfo.GameState.PLACE_SHIPS;
             (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
         }
