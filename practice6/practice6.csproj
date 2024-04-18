@@ -28,6 +28,7 @@
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <PackageCertificateThumbprint>AEE84284E7A0075876BA8D169E0FC7BF8FA671E7</PackageCertificateThumbprint>
+    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -118,6 +119,8 @@
     <Content Include="Assets\Textures\longship.png" />
     <Content Include="Assets\Textures\lose.jpg" />
     <Content Include="Assets\Textures\mediumship.png" />
+    <Content Include="Assets\Textures\mediumship1.png" />
+    <Content Include="Assets\Textures\mediumship2.png" />
     <Content Include="Assets\Textures\metal_texture.jpg" />
     <Content Include="Assets\Textures\ocean.png" />
     <Content Include="Assets\Textures\pearlharbor.jpg" />

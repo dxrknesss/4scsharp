@@ -18,9 +18,10 @@ namespace practice6
 
         void InitializeComponents()
         {
-            Size size = new Size(1000, 1000);
+            Size size = new Size(1600, 1000);
             ApplicationView.PreferredLaunchViewSize = size;
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+            ApplicationView.GetForCurrentView().TryResizeView(size);
             Window.Current.CoreWindow.SizeChanged += (s, e) =>
             {
                 ApplicationView.GetForCurrentView().TryResizeView(size);

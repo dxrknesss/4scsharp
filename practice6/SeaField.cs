@@ -4,7 +4,7 @@ namespace practice6
 {
     internal class SeaField
     {
-        public static byte _xDim = 7, _yDim = 7;
+        public static byte _xDim = 10, _yDim = 10;
         char[,] _field = new char[_xDim, _yDim];
         public List<Point> ShipPoints;
 

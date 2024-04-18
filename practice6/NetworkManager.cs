@@ -36,7 +36,7 @@ namespace practice6
             try
             {
                 remotePoint = new IPEndPoint(IPAddress.Parse(ipAddr), port);
-                remotePoint2 = new IPEndPoint(IPAddress.Parse(ipAddr), port+1);
+                //remotePoint2 = new IPEndPoint(IPAddress.Parse(ipAddr), port+1);
             }
             catch (FormatException exception)
             {

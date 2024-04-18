@@ -37,6 +37,8 @@ namespace practice6
         readonly BitmapImage _longShip1 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship1.png")),
                 _longShip2 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship2.png")),
                 _longShip3 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship3.png")),
+                _mediumShip1 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/mediumship1.png")),
+                _mediumShip2 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/mediumship2.png")),
                 _explosion = new BitmapImage(new Uri("ms-appx:///Assets/Textures/explosion.png")),
                 _win = new BitmapImage(new Uri("ms-appx:///Assets/Textures/win.jpg")),
                 _lose = new BitmapImage(new Uri("ms-appx:///Assets/Textures/lose.jpg")),
@@ -694,7 +696,16 @@ namespace practice6
                 buttonName.Clear();
             }
 
-            double measurement = buttons[0].Height;
+            double measurement = 5;
+            if (buttons[0].ActualHeight > 0)
+            {
+                measurement = buttons[0].ActualHeight - 5;
+            }
+            else
+            {
+                measurement = buttons[0].Height / 2 - 5;
+            }
+
             for (int i = 0; i < buttons.Count; i++)
             {
                 Image image = new Image
@@ -710,13 +721,15 @@ namespace practice6
                 switch (i)
                 {
                     case 0:
-                        image.Source = buttons.Count > 1 ? _longShip1 : source ?? ShipClone.Source;
+                        image.Source = buttons.Count > 1 ? 
+                            (buttons.Count == 2 ? _mediumShip1 : _longShip2) 
+                            : ShipClone.Source;
                         break;
                     case 1:
-                        image.Source = selectedShip == 2 ? _longShip3 : _longShip2;
+                        image.Source = selectedShip == 2 ? _mediumShip2 : _longShip3;
                         break;
                     case 2:
-                        image.Source = _longShip3;
+                        image.Source = _longShip1;
                         break;
                 }
 
