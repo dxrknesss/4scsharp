@@ -1,21 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
+﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using System.Net.Sockets;
-using System.Text;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace practice6
 {
@@ -24,6 +9,29 @@ namespace practice6
         public LobbyMenu()
         {
             this.InitializeComponent();
+            InitializeComponents();
+        }
+
+        void InitializeComponents()
+        {
+            double windowHeight = Window.Current.Bounds.Height,
+                windowWidth = Window.Current.Bounds.Width;
+            ButtonGrid.Width = windowWidth / 2;
+            ButtonGrid.Height = windowHeight / 2;
+
+            double gridWidth = ButtonGrid.Width;
+            double gridHeightBy4 = ButtonGrid.Height / 4;
+            HostButton.Width = gridWidth / 1.5;
+            HostButton.Height = gridHeightBy4;
+
+            JoinButton.Width = gridWidth / 1.5;
+            JoinButton.Height = gridHeightBy4;
+
+            BackButton.Width = gridWidth / 2;
+            BackButton.Height = gridHeightBy4 / 1.5;
+
+            JoinGameButton.Width = JoinGameGrid.Width / 2;
+            JoinGameButton.Height = JoinGameGrid.Height / 7;
         }
 
         private void OnBackClick(object sender, RoutedEventArgs e)
@@ -49,9 +57,9 @@ namespace practice6
             GameInfo.CurrentGameType = GameInfo.GameType.MULTI;
             NetworkManager.CurrentPeerType = NetworkManager.PeerType.HOST;
 
-            MessageGrid.Visibility = vis;
-            HostGameRelativePanel.Visibility = vis;
-            HostGameButton.Visibility = vis;
+            NetworkManager.SetClient(5555);
+
+            (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
         }
 
         private void JoinButtonClicked(object sender, RoutedEventArgs e)
@@ -61,32 +69,21 @@ namespace practice6
 
             NetworkManager.CurrentPeerType = NetworkManager.PeerType.CLIENT;
 
-            MessageGrid.Visibility = vis;
+            JoinGameGrid.Visibility = vis;
             JoinGameButton.Visibility = vis;
             JoinGameRelativePanel.Visibility = vis;
         }
 
-        private void HostGame(object sender, RoutedEventArgs e)
-        {
-            NetworkManager.SetClient(5555);
-
-            (Window.Current.Content as Frame).Navigate(typeof(Battlefield));
-        }
-
         private void JoinGame(object sender, RoutedEventArgs e)
         {
-            if (InputIPJoin.Text.Length != 0 && InputLobbyNameJoin.Text.Length != 0)
-            {
-                return;
-            }
-
             if (InputIPJoin.Text.Length != 0)
             {
                 NetworkManager.SetClient(InputIPJoin.Text, 5555);
             }
 
             if (NetworkManager.SendDataSync(
-                NetworkManager.PacketType.PT_HELLO, NetworkManager.PacketType.PT_ACK,
+                new byte[] { (byte)NetworkManager.PacketType.PT_HELLO },
+                NetworkManager.PacketType.PT_ACK,
                 NetworkManager.RemoteConnectionPoint))
             {
                 NetworkManager.ConnectionEstablished = true;

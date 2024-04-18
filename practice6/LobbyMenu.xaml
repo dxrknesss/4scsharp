@@ -6,15 +6,17 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="White" Width="1600" Height="900">
+    Background="White">
     <Page.Resources>
         <MediaElement x:Name="ButtonSound" Source="Assets/Sounds/button_hover.wav" AutoPlay="False"></MediaElement>
     </Page.Resources>
 
     <Grid>
-        <Image Source="Assets/Textures/pearlharbor.jpg"/>
+        <Grid.Background>
+            <ImageBrush ImageSource="Assets/Textures/pearlharbor.jpg"/>
+        </Grid.Background>
 
-        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Height="500">
+        <Grid x:Name="ButtonGrid" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
@@ -23,60 +25,48 @@
 
             <Button x:Name="HostButton" Grid.Row="0"
                     PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound"
-                    Click="HostButtonClicked">
+                    Click="HostButtonClicked"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
                 Host
             </Button>
 
             <Button x:Name="JoinButton" Grid.Row="1"
                     PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound"
-                    Click="JoinButtonClicked">
+                    Click="JoinButtonClicked"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
                 Join
             </Button>
 
             <Button x:Name="BackButton" Click="OnBackClick" Grid.Row="2"
-                    Width="300" Height="70" FontSize="30"
-                    PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound">
+                    FontSize="30"
+                    PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
                 Back
             </Button>
         </Grid>
 
-        <Grid x:Name="MessageGrid" Background="Navy" Width="600" Height="500"
+        <Grid x:Name="JoinGameGrid" Width="600" Height="500"
                 HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
+            <Grid.Background>
+                <ImageBrush ImageSource="Assets/Textures/join.jpg"></ImageBrush>
+            </Grid.Background>
+
             <Grid.RowDefinitions>
-                <RowDefinition Height="1.5*"></RowDefinition>
+                <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
 
             <RelativePanel x:Name="JoinGameRelativePanel" Grid.Row="0"
-                           VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Collapsed">
-                <TextBlock x:Name="IPLabelJoin" Text="IP Address:" FontSize="40" Margin="15,40,10,0"
+                           VerticalAlignment="Center" HorizontalAlignment="Stretch" Visibility="Collapsed">
+                <TextBlock x:Name="IPLabelJoin" Foreground="Red"  Text="IP Address:" FontSize="40" Margin="15,0,10,0"
                            RelativePanel.AlignTopWithPanel="True"></TextBlock>
                 <TextBox x:Name="InputIPJoin" Height="50" Width="300" 
                          RelativePanel.AlignVerticalCenterWith="IPLabelJoin"
-                         RelativePanel.AlignRightWithPanel="True" Margin="0,0,20,0"></TextBox>
-                
-                <TextBlock x:Name="Or" Height="50" Width="300" Text="OR"
-                         RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True"
-                           TextAlignment="Center" FontSize="40"></TextBlock>
-                
-                <TextBlock x:Name="LobbyNameLabelJoin" Text="Lobby name:" FontSize="40" 
-                           Margin="15,0,10,50" RelativePanel.AlignBottomWithPanel="True"></TextBlock>
-                <TextBox x:Name="InputLobbyNameJoin" Height="50" Width="300" 
-                         RelativePanel.AlignVerticalCenterWith="LobbyNameLabelJoin"
-                         RelativePanel.AlignRightWithPanel="True" Margin="0,0,20,0"></TextBox>
-            </RelativePanel>
-
-            <RelativePanel x:Name="HostGameRelativePanel" Grid.Row="0"
-                           VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Collapsed">
-                <TextBlock x:Name="LobbyNameLabelHost" Text="Lobby name:" FontSize="40" 
-                           RelativePanel.AlignVerticalCenterWithPanel="True" Margin="15,0,10,0"></TextBlock>
-                <TextBox x:Name="InputLobbyNameHost" Height="50" Width="300" 
-                         RelativePanel.AlignVerticalCenterWith="LobbyNameLabelHost" RelativePanel.AlignRightWithPanel="True"
-                         Margin="0,0,20,0"></TextBox>
+                         RelativePanel.AlignRightWithPanel="True" Margin="0,0,20,0"
+                         Padding="10,10,0,0" FontSize="20"></TextBox>
             </RelativePanel>
 
             <Button x:Name="JoinGameButton" Grid.Row="1" Click="JoinGame" Visibility="Collapsed">join</Button>
-            <Button x:Name="HostGameButton" Grid.Row="1" Click="HostGame" Visibility="Collapsed">host</Button>
         </Grid>
     </Grid>
 </Page>

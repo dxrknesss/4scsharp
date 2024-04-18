@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
@@ -37,10 +37,7 @@ namespace practice6
         readonly BitmapImage _longShip1 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship1.png")),
                 _longShip2 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship2.png")),
                 _longShip3 = new BitmapImage(new Uri("ms-appx:///Assets/Textures/longship3.png")),
-                _explosion = new BitmapImage(new Uri("ms-appx:///Assets/Textures/explosion.png")),
-                _win = new BitmapImage(new Uri("ms-appx:///Assets/Textures/win.jpg")),
-                _lose = new BitmapImage(new Uri("ms-appx:///Assets/Textures/lose.jpg")),
-                _wave = new BitmapImage(new Uri("ms-appx:///Assets/Textures/wave.png"));
+                _explosion = new BitmapImage(new Uri("ms-appx:///Assets/Textures/explosion.png"));
         Random _rnd;
         bool _isEnemyReady = false;
 
@@ -72,7 +69,7 @@ namespace practice6
         void InitializeFields()
         {
             StringBuilder sb = new StringBuilder();
-            SolidColorBrush color = new SolidColorBrush(Windows.UI.Colors.DodgerBlue);
+            SolidColorBrush gray = new SolidColorBrush(Windows.UI.Colors.Gray);
             Thickness margin2 = new Thickness(2, 2, 2, 2);
             double buttonHeight = EnemyField.Height / SeaField._yDim - margin2.Top * 2;
             double buttonWidth = EnemyField.Width / SeaField._xDim - margin2.Left * 2;
@@ -89,13 +86,13 @@ namespace practice6
                 PlayerField.RowDefinitions.Add(new RowDefinition());
                 for (int j = 0; j < SeaField._yDim; j++)
                 {
-                    EnemyField.Children.Add(CreateButton(i, j, color, ref sb, margin2, buttonHeight, buttonWidth, true));
-                    PlayerField.Children.Add(CreateButton(i, j, color, ref sb, margin2, buttonHeight, buttonWidth, false));
+                    EnemyField.Children.Add(CreateButton(i, j, gray, ref sb, margin2, buttonHeight, buttonWidth, true));
+                    PlayerField.Children.Add(CreateButton(i, j, gray, ref sb, margin2, buttonHeight, buttonWidth, false));
                 }
             }
         }
 
-        Button CreateButton(int row, int col, Brush background,
+        Button CreateButton(int row, int col, SolidColorBrush backgroundColor,
             ref StringBuilder name, Thickness margin, double buttonHeight, double buttonWidth, bool isEnemyField)
         {
             name.Append(isEnemyField ? "EnemyButton" : "PlayerButton");
@@ -103,7 +100,7 @@ namespace practice6
 
             Button button = new Button
             {
-                Background = background,
+                Background = backgroundColor,
                 Margin = margin,
                 Name = name.ToString(),
                 Width = buttonWidth,
@@ -148,7 +145,7 @@ namespace practice6
                     hasHit = true;
                     CheckWinLoseCondition(_player.ShipPoints);
                 }
-                DrawHit(point, false, hasHit);
+                DrawHit(point, false);
                 _player[point.X, point.Y] = 'x';
                 GameInfo.CurrentGameState = hasHit ? GameInfo.GameState.WAIT : GameInfo.GameState.ATTACK;
             }
@@ -186,8 +183,7 @@ namespace practice6
         void InitializeElements()
         {
             double windowHeight = Window.Current.Bounds.Height,
-                windowWidth = Window.Current.Bounds.Width,
-                marginH = windowWidth / 100, marginV = windowHeight / 100;
+                windowWidth = Window.Current.Bounds.Width;
             var banner = WinLoseBanner;
             Canvas.SetTop(banner, (windowHeight - banner.Height) / 2);
             Canvas.SetLeft(banner, (windowWidth - banner.Width) / 2);
@@ -200,31 +196,10 @@ namespace practice6
                 relPanel.Height = EnemyShips.Height / 1.2;
                 (relPanel.Children[0] as Image).Height = relPanel.Height;
                 (relPanel.Children[0] as Image).Width = relPanel.Height * (i + 1);
-
-                (ShipCloneCanvas.Children[i] as Image).Height = relPanel.Height;
-                (ShipCloneCanvas.Children[i] as Image).Width = relPanel.Height * (i + 1);
             }
 
-            EnemyRelPanel.Width = windowWidth * 0.75;
-            EnemyRelPanel.Height = (windowHeight - (EnemyShips.Height * 2) - marginV * 4) / 2;
-            Canvas.SetTop(EnemyRelPanel, EnemyShips.Height + marginV);
-
-            PlayerRelPanel.Width = windowWidth * 0.75;
-            PlayerRelPanel.Height = (windowHeight - (EnemyShips.Height * 2) - marginV * 4) / 2;
-            Canvas.SetTop(PlayerRelPanel, EnemyShips.Height + marginV + EnemyRelPanel.Height + marginV * 2);
-
-            BackToMenuButton.Width = WinLoseBanner.Width / 2;
-            BackToMenuButton.Height = WinLoseBanner.Height / 5;
-
             LeftAnnBar.Height = windowHeight - EnemyShips.Height * 2;
-            LeftAnnBar.Width = (windowWidth - EnemyRelPanel.Width - marginH * 2) / 2;
-
             RightAnnBar.Height = windowHeight - EnemyShips.Height * 2;
-            RightAnnBar.Width = (windowWidth - PlayerRelPanel.Width - marginH * 2) / 2;
-            Canvas.SetLeft(RightAnnBar, LeftAnnBar.Width + marginH + EnemyRelPanel.Width + marginH);
-
-            Canvas.SetLeft(PlayerRelPanel, LeftAnnBar.Width + marginH);
-            Canvas.SetLeft(EnemyRelPanel, LeftAnnBar.Width + marginH);
 
             PlayerShips.Width = windowWidth;
             PlayerShips.Height = windowHeight / 15;
@@ -236,6 +211,7 @@ namespace practice6
                 (relPanel.Children[0] as Image).Height = relPanel.Height;
                 (relPanel.Children[0] as Image).Width = relPanel.Height * (i + 1);
             }
+            // todo: expand
         }
 
         async void InitializeNetworkPart()
@@ -321,13 +297,11 @@ namespace practice6
                 // todo: fix for multiplayer
                 if (list == _player.ShipPoints) // compare by reference
                 {
-                    WinLoseBackground.ImageSource = _lose;
                     LoseSound.Play();
                     WinLoseText.Text = "You lose!";
                 }
                 else if (list == _enemy.ShipPoints)
                 {
-                    WinLoseBackground.ImageSource = _win;
                     WinSound.Play();
                     WinLoseText.Text = "You win!";
                 }
@@ -377,23 +351,22 @@ namespace practice6
                     return;
                 }
 
-                if (GameInfo.CurrentGameType == GameInfo.GameType.MULTI)
+                await Task.Run(() =>
                 {
-                    await Task.Run(() =>
-                    {
-                        byte[] headerPayload = new byte[] { (byte)NetworkManager.PacketType.PT_POINT },
-                        pointPayload = JsonSerializer.SerializeToUtf8Bytes(hitPoint);
+                    // todo: refactor to network manager class
+                    byte[] headerPayload = new byte[] { (byte)NetworkManager.PacketType.PT_POINT },
+                    pointPayload = JsonSerializer.SerializeToUtf8Bytes(hitPoint);
 
-                        byte[] payload = new byte[headerPayload.Length + pointPayload.Length];
-                        headerPayload.CopyTo(payload, 0);
-                        pointPayload.CopyTo(payload, headerPayload.Length);
+                    byte[] payload = new byte[headerPayload.Length + pointPayload.Length];
+                    headerPayload.CopyTo(payload, 0);
+                    pointPayload.CopyTo(payload, headerPayload.Length);
 
-                        NetworkManager.SendDataSync(
-                            payload,
-                            null,
-                            NetworkManager.RemoteConnectionPoint);
-                    });
-                }
+                    NetworkManager.SendDataSync(
+                        payload, 
+                        //NetworkManager.PacketType.PT_ACK, 
+                        null,
+                        NetworkManager.RemoteConnectionPoint);
+                });
 
                 if (_enemy.ShipPoints.Contains(hitPoint))
                 {
@@ -405,7 +378,7 @@ namespace practice6
                 }
 
                 _enemy[row, col] = 'x';
-                DrawHit(hitPoint, true, hasHit);
+                DrawHit(hitPoint, true);
                 GameInfo.CurrentGameState = hasHit ? GameInfo.GameState.ATTACK : GameInfo.GameState.WAIT;
             }
         }
@@ -521,7 +494,7 @@ namespace practice6
                                                 hasHit = true;
                                                 CheckWinLoseCondition(_player.ShipPoints);
                                             }
-                                            DrawHit(point, false, hasHit);
+                                            DrawHit(point, false);
                                             _player[point.X, point.Y] = 'x';
                                             GameInfo.CurrentGameState = hasHit ? GameInfo.GameState.WAIT : GameInfo.GameState.ATTACK;
                                         });
@@ -652,7 +625,7 @@ namespace practice6
             Canvas.SetTop(ship, position.Y - ship.Height / 2);
         }
 
-        void DrawHit(Point where, bool isEnemyField, bool isSucessfull)
+        void DrawHit(Point where, bool isEnemyField)
         {
             StringBuilder buttonName = new StringBuilder();
             buttonName.Append(isEnemyField ? "EnemyButton" : "PlayerButton");
@@ -664,7 +637,7 @@ namespace practice6
             {
                 Width = measurement,
                 Height = measurement,
-                Source = isSucessfull ? _explosion : _wave,
+                Source = _explosion,
             };
             var currentContent = b.Content as Image;
             Grid grid = new Grid();
@@ -694,7 +667,7 @@ namespace practice6
                 buttonName.Clear();
             }
 
-            double measurement = buttons[0].Height;
+            double measurement = buttons[0].Height - 5;
             for (int i = 0; i < buttons.Count; i++)
             {
                 Image image = new Image
@@ -741,10 +714,6 @@ namespace practice6
                 GameInfo.GameStateChange -= ChangeAnnounceText;
                 GameInfo.GameStateChange -= BotAttack;
                 (Window.Current.Content as Frame).Navigate(typeof(MainPage));
-            }
-            else if (e.Key == Windows.System.VirtualKey.N)
-            {
-                WinSound.Source = new Uri("ms-appx:///Assets/Sounds/win_sound_NSFW.wav");
             }
         }
     }

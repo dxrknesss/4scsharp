@@ -1,26 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading;
-using System.Threading.Tasks;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Core;
+﻿using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Media.Core;
-using Windows.Storage;
-using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
 
 namespace practice6
 {
@@ -30,19 +13,29 @@ namespace practice6
         {
             this.InitializeComponent();
             Task.Run(() => GameInfo.GetInstance());
-            SetWindowSize();
-            MPButton.Click += OnMPClick;
+            InitializeComponents();
         }
 
-        void SetWindowSize()
+        void InitializeComponents()
         {
-            Size size = new Size(1600, 900);
+            Size size = new Size(1000, 1000);
             ApplicationView.PreferredLaunchViewSize = size;
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
             Window.Current.CoreWindow.SizeChanged += (s, e) =>
             {
                 ApplicationView.GetForCurrentView().TryResizeView(size);
             };
+
+            double windowHeight = Window.Current.Bounds.Height,
+                windowWidth = Window.Current.Bounds.Width;
+            ButtonGrid.Width = windowWidth / 2;
+            ButtonGrid.Height = windowHeight / 2;
+
+            SPButton.Height = ButtonGrid.Height / 4;
+            SPButton.Width = ButtonGrid.Width / 1.5;
+
+            MPButton.Height = ButtonGrid.Height / 4;
+            MPButton.Width = ButtonGrid.Width / 1.5;
         }
 
         private void OnMPClick(object sender, RoutedEventArgs e)

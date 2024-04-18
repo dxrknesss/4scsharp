@@ -6,84 +6,102 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="CadetBlue" Width="1600" Height="900">
+    Background="CadetBlue">
     <Page.Resources>
         <MediaElement x:Name="WinSound" Source="Assets/Sounds/win_sound.wav" AutoPlay="False" Volume="30"></MediaElement>
         <MediaElement x:Name="LoseSound" Source="Assets/Sounds/lose_sound.wav" AutoPlay="False"></MediaElement>
     </Page.Resources>
 
-    <Grid>
+    <Grid KeyDown="GridKeyDown">
+        <Grid.Background>
+            <ImageBrush ImageSource="Assets/Textures/ocean.png"></ImageBrush>
+        </Grid.Background>
+        
         <Canvas x:Name="BattlefieldCanvas">
             <Grid x:Name="WinLoseBanner" HorizontalAlignment="Center" VerticalAlignment="Center" Height="500" Width="700"
-                  Background="Navy" Visibility="Collapsed" Canvas.ZIndex="101">
+                  Visibility="Collapsed" Canvas.ZIndex="101">
+                <Grid.Background>
+                    <ImageBrush x:Name="WinLoseBackground"></ImageBrush>
+                </Grid.Background>
+                
                 <Grid.RowDefinitions>
                     <RowDefinition></RowDefinition>
                     <RowDefinition></RowDefinition>
                 </Grid.RowDefinitions>
+
                 <TextBlock Grid.Row="0"  x:Name="WinLoseText" FontSize="60" TextAlignment="Center"
                            VerticalAlignment="Center">You won!</TextBlock>
                 <Button Grid.Row="1" x:Name="BackToMenuButton" VerticalAlignment="Top" Click="BackToMenu">Back to menu</Button>
             </Grid>
             
-            <StackPanel x:Name="EnemyShips" Height="60" Width="{x:Bind Width}" Background="DarkSlateBlue">
-                <Grid VerticalAlignment="Center" Height="{x:Bind EnemyShips.Height}">
+            <StackPanel x:Name="EnemyShips">
+                <StackPanel.Background>
+                    <ImageBrush ImageSource="Assets/Textures/green_metal.jpg" Stretch="UniformToFill">
+                    </ImageBrush>
+                </StackPanel.Background>
+
+                <Grid x:Name="EnemyShipsGrid" VerticalAlignment="Center" Height="{x:Bind EnemyShips.Height}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
 
-                    <RelativePanel Grid.Column="0" HorizontalAlignment="Center" Height="50">
-                        <Image x:Name="EnemyShip1" Source="Assets/Textures/ship.png" Width="50" Height="50" />
+                    <RelativePanel Grid.Column="0" HorizontalAlignment="Center">
+                        <Image x:Name="EnemyShip1" Source="Assets/Textures/ship.png" />
                         <TextBlock RelativePanel.AlignVerticalCenterWith="EnemyShip1" RelativePanel.RightOf="EnemyShip1" 
-                                   FontSize="30" Text="x4" />
+                                   FontSize="30" Text="x???" />
                     </RelativePanel>
 
-                    <RelativePanel Grid.Column="1" Height="50">
-                        <Image x:Name="EnemyShip2" Width="100" Height="50" Margin="200,0,0,0" Source="Assets/Textures/mediumship.png"/>
+                    <RelativePanel Grid.Column="1">
+                        <Image x:Name="EnemyShip2" Margin="200,0,0,0" Source="Assets/Textures/mediumship.png"/>
                         <TextBlock RelativePanel.AlignVerticalCenterWith="EnemyShip2" RelativePanel.RightOf="EnemyShip2" 
-                                   FontSize="30" Text="x2" />
+                                   FontSize="30" Text="x???" />
                     </RelativePanel>
 
-                    <RelativePanel Grid.Column="2" Height="50">
-                        <Image x:Name="EnemyShip3" Width="150" Height="50" Margin="200,0,0,0" Source="Assets/Textures/longship.png"/>
+                    <RelativePanel Grid.Column="2">
+                        <Image x:Name="EnemyShip3" Margin="200,0,0,0" Source="Assets/Textures/longship.png"/>
                         <TextBlock RelativePanel.AlignVerticalCenterWith="EnemyShip3" RelativePanel.RightOf="EnemyShip3" 
-                                   FontSize="30" Text="x2" />
+                                   FontSize="30" Text="x???" />
                     </RelativePanel>
                 </Grid>
             </StackPanel>
             
-            <Grid x:Name="LeftAnnBar" Width="140" Height="780" Canvas.Top="{x:Bind EnemyShips.Height}" 
-                        Background="Navy">
-                <TextBlock x:Name="LeftAnnounce" FontSize="30" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
+            <Grid x:Name="LeftAnnBar" Canvas.Top="{x:Bind EnemyShips.Height}">
+                <Grid.Background>
+                    <ImageBrush ImageSource="Assets/Textures/metal_texture.jpg" Stretch="UniformToFill"></ImageBrush>
+                </Grid.Background>
+
+                <TextBlock x:Name="LeftAnnounce" FontSize="35" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
             </Grid>
-            <Grid x:Name="RightAnnBar" Width="140" Height="780" Canvas.Top="{x:Bind EnemyShips.Height}" 
-                        FlowDirection="RightToLeft" Canvas.Left="1460" Background="Navy">
-                <TextBlock x:Name="RightAnnounce" FontSize="{x:Bind LeftAnnounce.FontSize}" VerticalAlignment="Center" TextAlignment="Center" Text="{x:Bind LeftAnnounce.Text}"></TextBlock>
+            <Grid x:Name="RightAnnBar" Canvas.Top="{x:Bind EnemyShips.Height}" Background="{x:Bind LeftAnnBar.Background}"
+                  FlowDirection="RightToLeft">
+                <TextBlock x:Name="RightAnnounce" FontSize="{x:Bind LeftAnnounce.FontSize}" VerticalAlignment="Center" 
+                           TextAlignment="{x:Bind LeftAnnounce.TextAlignment}" Text="{x:Bind LeftAnnounce.Text}"></TextBlock>
             </Grid>
 
-            <RelativePanel x:Name="EnemyRelPanel" Canvas.Top="70" Width="1300" Canvas.Left="150">
-                <Grid x:Name="EnemyField" Height="370" Width="{x:Bind EnemyRelPanel.Width}" 
+            <RelativePanel x:Name="EnemyRelPanel">
+                <Grid x:Name="EnemyField" Height="{x:Bind EnemyRelPanel.Height}" Width="{x:Bind EnemyRelPanel.Width}" 
                       RelativePanel.AlignHorizontalCenterWithPanel="True">
                 </Grid>
             </RelativePanel>
 
-            <RelativePanel x:Name="PlayerRelPanel" Canvas.Top="460" Width="1300" Canvas.Left="150">
-                <Grid x:Name="PlayerField" Height="370" Width="{x:Bind PlayerRelPanel.Width}" 
+            <RelativePanel x:Name="PlayerRelPanel">
+                <Grid x:Name="PlayerField" Height="{x:Bind PlayerRelPanel.Height}" Width="{x:Bind PlayerRelPanel.Width}" 
                       RelativePanel.AlignHorizontalCenterWithPanel="True">
                 </Grid>
             </RelativePanel>
 
-            <StackPanel x:Name="PlayerShips"  Width="1600" Height="60" Canvas.Top="840" Background="DarkSlateBlue">
-                <Grid VerticalAlignment="Center" Height="{x:Bind PlayerShips.Height}">
+            <StackPanel x:Name="PlayerShips" Background="{x:Bind EnemyShips.Background}">
+                <Grid x:Name="PlayerShipsGrid" VerticalAlignment="Center" Height="{x:Bind PlayerShips.Height}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     
-                    <RelativePanel Grid.Column="0" HorizontalAlignment="Center" Height="50">
-                        <Image x:Name="TakeShip" Source="Assets/Textures/ship.png" Width="50" Height="50" 
+                    <RelativePanel Grid.Column="0" HorizontalAlignment="Center">
+                        <Image x:Name="TakeShip" Source="Assets/Textures/ship.png" 
                                PointerPressed="ClickTakeShip"/>
                         <TextBlock RelativePanel.AlignVerticalCenterWith="TakeShip" RelativePanel.RightOf="TakeShip" 
                                FontSize="30">
@@ -93,8 +111,8 @@
                         </TextBlock>
                     </RelativePanel>
 
-                    <RelativePanel Grid.Column="1" Height="50">
-                        <Image x:Name="TakeMediumShip" Width="100" Height="50" Margin="200,0,0,0" Source="Assets/Textures/mediumship.png" PointerPressed="ClickTakeShip" />
+                    <RelativePanel Grid.Column="1">
+                        <Image x:Name="TakeMediumShip" Margin="200,0,0,0" Source="Assets/Textures/mediumship.png" PointerPressed="ClickTakeShip" />
                         <TextBlock RelativePanel.AlignVerticalCenterWith="TakeMediumShip" RelativePanel.RightOf="TakeMediumShip" 
                                    FontSize="30">
                             <TextBlock.Inlines>
@@ -103,8 +121,8 @@
                         </TextBlock>
                     </RelativePanel>
 
-                    <RelativePanel Grid.Column="2" Height="50">
-                        <Image x:Name="TakeLongShip" Width="150" Height="50" Margin="200,0,0,0" Source="Assets/Textures/longship.png" PointerPressed="ClickTakeShip" />
+                    <RelativePanel Grid.Column="2">
+                        <Image x:Name="TakeLongShip" Margin="200,0,0,0" Source="Assets/Textures/longship.png" PointerPressed="ClickTakeShip" />
                         <TextBlock RelativePanel.AlignVerticalCenterWith="TakeLongShip" RelativePanel.RightOf="TakeLongShip" 
                                    FontSize="30">
                             <TextBlock.Inlines>
@@ -117,9 +135,9 @@
         </Canvas>
 
         <Canvas x:Name="ShipCloneCanvas">
-            <Image x:Name="ShipClone" Width="50" Height="50" Source="Assets/Textures/ship.png" Visibility="Collapsed"></Image>
-            <Image x:Name="MediumShipClone" Width="100" Height="50" Source="Assets/Textures/mediumship.png" Visibility="Collapsed"></Image>
-            <Image x:Name="LongShipClone" Width="150" Height="50" Source="Assets/Textures/longship.png" Visibility="Collapsed"></Image>
+            <Image x:Name="ShipClone" Source="Assets/Textures/ship.png" Visibility="Collapsed"></Image>
+            <Image x:Name="MediumShipClone" Source="Assets/Textures/mediumship.png" Visibility="Collapsed"></Image>
+            <Image x:Name="LongShipClone" Source="Assets/Textures/longship.png" Visibility="Collapsed"></Image>
         </Canvas>
     </Grid>
 </Page>

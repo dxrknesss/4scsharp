@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -12,7 +12,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.19041.0</TargetPlatformVersion>
-<LangVersion>8.0</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -111,16 +111,23 @@
     <Content Include="Assets\Icons\Wide310x150Logo.scale-100.png" />
     <Content Include="Assets\Sounds\lose_sound.wav" />
     <Content Include="Assets\Sounds\win_sound.wav" />
+    <Content Include="Assets\Sounds\win_sound_NSFW.wav" />
     <Content Include="Assets\Textures\explosion.png" />
+    <Content Include="Assets\Textures\green_metal.jpg" />
+    <Content Include="Assets\Textures\join.jpg" />
     <Content Include="Assets\Textures\longship.png" />
+    <Content Include="Assets\Textures\lose.jpg" />
     <Content Include="Assets\Textures\mediumship.png" />
     <Content Include="Assets\Textures\metal_texture.jpg" />
+    <Content Include="Assets\Textures\ocean.png" />
     <Content Include="Assets\Textures\pearlharbor.jpg" />
     <Content Include="Assets\Sounds\button_hover.wav" />
     <Content Include="Assets\Textures\longship1.png" />
     <Content Include="Assets\Textures\longship2.png" />
     <Content Include="Assets\Textures\longship3.png" />
     <Content Include="Assets\Textures\ship.png" />
+    <Content Include="Assets\Textures\wave.png" />
+    <Content Include="Assets\Textures\win.jpg" />
     <Content Include="Properties\Default.rd.xml" />
   </ItemGroup>
   <ItemGroup>

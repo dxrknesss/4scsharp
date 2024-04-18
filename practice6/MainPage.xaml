@@ -6,24 +6,33 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="White" Width="1600" Height="900">
+    Background="White">
     <Page.Resources>
         <MediaElement x:Name="ButtonSound" Source="Assets/Sounds/button_hover.wav" AutoPlay="False"></MediaElement>
     </Page.Resources>
 
     <Grid>
-        
-        <Image Source="Assets/Textures/pearlharbor.jpg"/>
-        <RelativePanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,200,0,0">
-            <Button x:Name="MPButton" RelativePanel.AlignHorizontalCenterWithPanel="True" Click="OnMPClick"
-                    PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound">
+        <Grid.Background>
+            <ImageBrush ImageSource="Assets/Textures/pearlharbor.jpg"/>
+        </Grid.Background>
+
+        <Grid x:Name="ButtonGrid" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Button Grid.Row="0" x:Name="MPButton" Click="OnMPClick"
+                    PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound"
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
                 Multiplayer game
             </Button>
 
-            <Button x:Name="SPButton" RelativePanel.Below="MPButton" Margin="200" Click="OnSPClick"
-                    PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound">
+            <Button Grid.Row="1" x:Name="SPButton" Click="OnSPClick"
+                    PointerEntered="ButtonOnHoverSound" PointerExited="ButtonOnUnhoverSound"
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
                 Singleplayer game
             </Button>
-        </RelativePanel>
+        </Grid>
     </Grid>
 </Page>
